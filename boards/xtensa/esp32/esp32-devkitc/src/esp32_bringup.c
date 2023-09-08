@@ -108,6 +108,10 @@
 #  include "esp32_bmp280.h"
 #endif
 
+#ifdef CONFIG_SENSORS_MPU60X0
+#  include "esp32_mpu6050.h"
+#endif
+
 #ifdef CONFIG_SENSORS_SHT3X
 #  include "esp32_sht3x.h"
 #endif
@@ -496,7 +500,7 @@ int esp32_bringup(void)
     }
 #endif
 
-#ifdef CONFIG_SENSORS_MPU6050
+#ifdef CONFIG_SENSORS_MPU60X0
   /* Try to register MPU6050 device in I2C0 */
 
   ret = board_mpu6050_initialize(0, 0);

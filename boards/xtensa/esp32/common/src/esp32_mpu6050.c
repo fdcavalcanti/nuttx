@@ -33,7 +33,7 @@
 
 #include "esp32_board_i2c.h"
 #include "esp32_i2c.h"
-#include "esp32_bmp280.h"
+#include "esp32_mpu6050.h"
 
 /****************************************************************************
  * Pre-processor Definitions
@@ -104,7 +104,7 @@ int board_mpu6050_initialize(int devno, int busno)
       mpu_config->i2c = i2c;
       mpu_config->addr = 0x68;
 
-      snprintf(device, sizeof(device), "/dev/imu%d", device, devno);
+      snprintf(device, sizeof(device), "/dev/imu%d", devno);
       ret = mpu60x0_register(device, mpu_config);
       if (ret < 0)
         {
