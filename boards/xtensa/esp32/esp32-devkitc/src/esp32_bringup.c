@@ -496,6 +496,17 @@ int esp32_bringup(void)
     }
 #endif
 
+#ifdef CONFIG_SENSORS_MPU6050
+  /* Try to register MPU6050 device in I2C0 */
+
+  ret = board_mpu6050_initialize(0, 0);
+
+  if (ret < 0)
+    {
+      syslog(LOG_ERR, "Failed to initialize MPU6050 driver: %d\n", ret);
+    }
+#endif
+
 #ifdef CONFIG_ESP32_I2S
 
 #if defined(CONFIG_ESP32_I2S0) && !defined(CONFIG_AUDIO_CS4344) || \
