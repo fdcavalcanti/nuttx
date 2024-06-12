@@ -52,6 +52,10 @@ ifeq ($(CONFIG_ESPRESSIF_WIFI),y)
   CSRCS += esp_board_wlan.c
 endif
 
+ifeq ($(CONFIG_ESP_MCPWM),y)
+  CSRCS += esp_board_mcpwm.c
+endif
+
 DEPPATH += --dep-path src
 VPATH += :src
 CFLAGS += ${INCDIR_PREFIX}$(TOPDIR)$(DELIM)arch$(DELIM)$(CONFIG_ARCH)$(DELIM)src$(DELIM)board$(DELIM)src
