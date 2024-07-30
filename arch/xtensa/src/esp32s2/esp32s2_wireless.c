@@ -38,7 +38,7 @@
 #include "hardware/esp32s2_syscon.h"
 #include "hardware/esp32s2_system.h"
 #include "esp32s2_irq.h"
-#include "esp32s2_partition.h"
+/* #include "esp32s2_partition.h" */
 
 #include "esp_private/phy.h"
 #ifdef CONFIG_ESP32S2_WIFI
@@ -938,7 +938,7 @@ int32_t esp_timer_create(const esp_timer_create_args_t *create_args,
   rt_timer_args.arg = create_args->arg;
   rt_timer_args.callback = create_args->callback;
 
-  ret = esp32s2_rt_timer_create(&rt_timer_args, &rt_timer);
+  ret = rt_timer_create(&rt_timer_args, &rt_timer);
   if (ret)
     {
       wlerr("Failed to create rt_timer error=%d\n", ret);
@@ -969,7 +969,7 @@ int32_t esp_timer_start_once(esp_timer_handle_t timer, uint64_t timeout_us)
 {
   struct rt_timer_s *rt_timer = (struct rt_timer_s *)timer;
 
-  esp32s2_rt_timer_start(rt_timer, timeout_us, false);
+  rt_timer_start(rt_timer, timeout_us, false);
 
   return 0;
 }
@@ -993,7 +993,7 @@ int32_t esp_timer_start_periodic(esp_timer_handle_t timer, uint64_t period)
 {
   struct rt_timer_s *rt_timer = (struct rt_timer_s *)timer;
 
-  esp32s2_rt_timer_start(rt_timer, period, true);
+  rt_timer_start(rt_timer, period, true);
 
   return 0;
 }
@@ -1016,7 +1016,7 @@ int32_t esp_timer_stop(esp_timer_handle_t timer)
 {
   struct rt_timer_s *rt_timer = (struct rt_timer_s *)timer;
 
-  esp32s2_rt_timer_stop(rt_timer);
+  rt_timer_stop(rt_timer);
 
   return 0;
 }
@@ -1039,7 +1039,7 @@ int32_t esp_timer_delete(esp_timer_handle_t timer)
 {
   struct rt_timer_s *rt_timer = (struct rt_timer_s *)timer;
 
-  esp32s2_rt_timer_delete(rt_timer);
+  rt_timer_delete(rt_timer);
 
   return 0;
 }
@@ -1189,7 +1189,7 @@ int esp_wireless_init(void)
       return OK;
     }
 
-  priv->cpuint = esp32s2_setup_irq(0, SWI_PERIPH, ESP32S2_INT_PRIO_DEF, 0);
+  priv->cpuint = esp32s2_setup_irq(SWI_PERIPH, ESP32S2_INT_PRIO_DEF, 0);
   if (priv->cpuint < 0)
     {
       /* Failed to allocate a CPU interrupt of this type. */
@@ -1204,7 +1204,7 @@ int esp_wireless_init(void)
   ret = irq_attach(SWI_IRQ, esp_swi_irq, NULL);
   if (ret < 0)
     {
-      esp32s2_teardown_irq(0, SWI_PERIPH, priv->cpuint);
+      esp32s2_teardown_irq(SWI_PERIPH, priv->cpuint);
       leave_critical_section(flags);
       wlerr("ERROR: Failed to attach IRQ ret=%d\n", ret);
 
@@ -1252,7 +1252,7 @@ int esp_wireless_deinit(void)
         {
           up_disable_irq(SWI_IRQ);
           irq_detach(SWI_IRQ);
-          esp32s2_teardown_irq(0, SWI_PERIPH, priv->cpuint);
+          esp32s2_teardown_irq(SWI_PERIPH, priv->cpuint);
         }
     }
 

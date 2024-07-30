@@ -51,7 +51,7 @@
 #include "esp32s2_wifi_utils.h"
 #include "esp32s2_wifi_adapter.h"
 #include "esp32s2_wireless.h"
-#include "esp32s2_systemreset.h"
+/* #include "esp32s2_systemreset.h" */
 
 /****************************************************************************
  * Pre-processor Definitions
@@ -1084,7 +1084,9 @@ static int wlan_ifup(struct net_driver_s *dev)
   priv->ifup = true;
   if (g_callback_register_ref == 0)
     {
-      ret = esp32s2_register_shutdown_handler(esp_wifi_stop_callback);
+      /* ret = esp32s2_register_shutdown_handler(esp_wifi_stop_callback); */
+
+      ret = -1;
       if (ret < 0)
         {
           nwarn("WARN: Failed to register handler ret=%d\n", ret);
@@ -1141,7 +1143,9 @@ static int wlan_ifdown(struct net_driver_s *dev)
   --g_callback_register_ref;
   if (g_callback_register_ref == 0)
     {
-      ret = esp32s2_unregister_shutdown_handler(esp_wifi_stop_callback);
+      /* ret = esp32s2_unregister_shutdown_handler(esp_wifi_stop_callback); */
+
+      ret = -1;
       if (ret < 0)
         {
           nwarn("WARN: Failed to unregister handler ret=%d\n", ret);

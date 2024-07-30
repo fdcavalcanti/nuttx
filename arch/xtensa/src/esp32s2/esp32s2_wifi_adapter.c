@@ -66,9 +66,10 @@
 #include "esp32s2_wifi_utils.h"
 #include "esp32s2_wlan.h"
 
-#ifdef CONFIG_PM
-#  include "esp32s3_pm.h"
-#endif
+/* #ifdef CONFIG_PM
+ * #  include "esp32s3_pm.h"
+ * #endif
+ */
 
 #include "esp_log.h"
 #include "esp_mac.h"
@@ -2695,7 +2696,7 @@ static void wifi_rtc_disable_iso(void)
 
 int64_t esp32s2_timer_get_time(void)
 {
-  return (int64_t)esp32s2_rt_timer_time_us();
+  return (int64_t)rt_timer_time_us();
 }
 
 /****************************************************************************
