@@ -56,6 +56,8 @@
 #  include "bootloader_init.h"
 #endif
 
+#include "esp_clk_internal.h"
+
 /****************************************************************************
  * Pre-processor Definitions
  ****************************************************************************/
@@ -361,6 +363,10 @@ static void noreturn_function IRAM_ATTR __esp32s2_start(void)
   /* Set CPU frequency configured in board.h */
 
   esp32s2_clockconfig();
+
+  /* Initialize peripherals parameters */
+
+  esp_perip_clk_init();
 
 #ifndef CONFIG_SUPPRESS_UART_CONFIG
   /* Configure the UART so we can get debug output */
