@@ -843,6 +843,7 @@ static void esp32s2_ints_off(uint32_t mask)
   wlinfo("INFO mask=%08x irq=%d\n", mask, irq);
 
   up_disable_irq(ESP32S2_IRQ_MAC);
+  up_disable_irq(ESP32S2_IRQ_PWR);
 }
 
 /****************************************************************************

@@ -297,6 +297,7 @@ void up_irqinitialize(void)
   g_irqmap[XTENSA_IRQ_SWINT]  = ESP32S2_CPUINT_SOFTWARE1;
 #ifdef CONFIG_ESP32S2_WIFI
   g_irqmap[ESP32S2_IRQ_MAC] = ESP32S2_CPUINT_MAC;
+  g_irqmap[ESP32S2_IRQ_PWR] = ESP32S2_CPUINT_PWR;
 #endif
 
   /* Initialize CPU interrupts */
@@ -307,6 +308,7 @@ void up_irqinitialize(void)
 
 #ifdef CONFIG_ESP32S2_WIFI
   g_cpu_intmap[ESP32S2_CPUINT_MAC] = CPUINT_ASSIGN(ESP32S2_IRQ_MAC);
+  g_cpu_intmap[ESP32S2_CPUINT_PWR] = CPUINT_ASSIGN(ESP32S2_IRQ_PWR);
   xtensa_enable_cpuint(&g_intenable, 1 << ESP32S2_CPUINT_MAC);
 #endif
 

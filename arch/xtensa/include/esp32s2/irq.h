@@ -422,6 +422,7 @@
 #define ESP32S2_CPUINT_NMISET         0x00004000
 
 #define ESP32S2_CPUINT_MAC            0
+#define ESP32S2_CPUINT_PWR            0
 #define ESP32S2_CPUINT_TIMER0         6
 #define ESP32S2_CPUINT_SOFTWARE0      7
 #define ESP32S2_CPUINT_PROFILING      11
