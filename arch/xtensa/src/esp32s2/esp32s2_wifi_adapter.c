@@ -330,6 +330,8 @@ static void *coex_schm_curr_phase_get_wrapper(void);
 static int coex_register_start_cb_wrapper(int (* cb)(void));
 static int coex_schm_process_restart_wrapper(void);
 static int coex_schm_register_cb_wrapper(int type, int(*cb)(int));
+static int coex_schm_flexible_period_set_wrapper(uint8_t period);
+static uint8_t coex_schm_flexible_period_get_wrapper(void);
 
 /****************************************************************************
  * Private Data
@@ -517,6 +519,8 @@ wifi_osi_funcs_t g_wifi_osi_funcs =
   ._coex_register_start_cb = coex_register_start_cb_wrapper,
   ._coex_schm_process_restart = coex_schm_process_restart_wrapper,
   ._coex_schm_register_cb = coex_schm_register_cb_wrapper,
+  ._coex_schm_flexible_period_set = coex_schm_flexible_period_set_wrapper,
+  ._coex_schm_flexible_period_get = coex_schm_flexible_period_get_wrapper,
   ._magic = ESP_WIFI_OS_ADAPTER_MAGIC,
 };
 
@@ -3882,6 +3886,61 @@ static int coex_schm_process_restart_wrapper(void)
 static int coex_schm_register_cb_wrapper(int type, int(*cb)(int))
 {
   return 0;
+}
+
+/****************************************************************************
+ * Name: coex_schm_flexible_period_set_wrapper
+ *
+ * Description:
+ *   This is a wrapper for coex_schm_flexible_period_set. It sets the
+ *   flexible period for the coexistence mechanism. If power management
+ *   feature is enabled (CONFIG_ESP_COEX_POWER_MANAGEMENT), it calls the
+ *   function with the given period. If the feature is not enabled, it
+ *   returns 0.
+ *
+ * Input Parameters:
+ *   period - The period to set for the coexistence mechanism.
+ *
+ * Returned Value:
+ *   If power management is enabled, it returns the result of the
+ *   coex_schm_flexible_period_set function. Otherwise, it returns 0.
+ *
+ ****************************************************************************/
+
+static int coex_schm_flexible_period_set_wrapper(uint8_t period)
+{
+#if CONFIG_ESP_COEX_POWER_MANAGEMENT
+  return coex_schm_flexible_period_set(period);
+#else
+  return 0;
+#endif
+}
+
+/****************************************************************************
+ * Name: coex_schm_flexible_period_get_wrapper
+ *
+ * Description:
+ *   This is a wrapper for coex_schm_flexible_period_get. If power management
+ *   feature is enabled (CONFIG_ESP_COEX_POWER_MANAGEMENT), it calls the
+ *   function and returns its result. If the feature is not enabled, it
+ *   returns 1.
+ *
+ * Input Parameters:
+ *   None
+ *
+ * Returned Value:
+ *   If power management is enabled, it returns the result of the
+ *   coex_schm_flexible_period_get function. Otherwise, it returns 1.
+ *
+ ****************************************************************************/
+
+static uint8_t coex_schm_flexible_period_get_wrapper(void)
+{
+#if CONFIG_ESP_COEX_POWER_MANAGEMENT
+  return coex_schm_flexible_period_get();
+#else
+  return 1;
+#endif
 }
 
 /****************************************************************************
