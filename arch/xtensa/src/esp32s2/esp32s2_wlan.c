@@ -1440,7 +1440,7 @@ static int wlan_ioctl(struct net_driver_s *dev,
  * Name: esp32s2_net_initialize
  *
  * Description:
- *   Initialize the ESP32-S3 driver
+ *   Initialize the ESP32-S2 driver
  *
  * Input Parameters:
  *   devno    - The device number
@@ -1646,7 +1646,7 @@ int esp32s2_wlan_sta_set_linkstatus(bool linkstatus)
  * Name: esp32s2_wlan_sta_initialize
  *
  * Description:
- *   Initialize the ESP32-S3 WLAN station netcard driver
+ *   Initialize the ESP32-S2 WLAN station netcard driver
  *
  * Input Parameters:
  *   None
@@ -1705,7 +1705,7 @@ int esp32s2_wlan_sta_initialize(void)
  * Name: esp32s2_wlan_softap_initialize
  *
  * Description:
- *   Initialize the ESP32-S3 WLAN softAP netcard driver
+ *   Initialize the ESP32-S2 WLAN softAP netcard driver
  *
  * Input Parameters:
  *   None

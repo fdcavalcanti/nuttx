@@ -66,11 +66,6 @@
 #include "esp32s2_wifi_utils.h"
 #include "esp32s2_wlan.h"
 
-/* #ifdef CONFIG_PM
- * #  include "esp32s3_pm.h"
- * #endif
- */
-
 #include "esp_log.h"
 #include "esp_mac.h"
 #include "esp_private/phy.h"
@@ -3961,10 +3956,10 @@ static IRAM_ATTR void esp_wifi_tx_done_cb(uint8_t ifidx, uint8_t *data,
  * Name: esp_wifi_auth_trans
  *
  * Description:
- *   Converts a ESP32-S3 authenticate mode values to WEXT authenticate mode.
+ *   Converts a ESP32-S2 authenticate mode values to WEXT authenticate mode.
  *
  * Input Parameters:
- *   wifi_auth - ESP32-S3 authenticate mode
+ *   wifi_auth - ESP32-S2 authenticate mode
  *
  * Returned Value:
  *   authenticate mode
@@ -4007,10 +4002,10 @@ static int esp_wifi_auth_trans(uint32_t wifi_auth)
  * Name: esp_wifi_cipher_trans
  *
  * Description:
- *   Converts a ESP32-S3 cipher type values to WEXT cipher type values.
+ *   Converts a ESP32-S2 cipher type values to WEXT cipher type values.
  *
  * Input Parameters:
- *   wifi_cipher - ESP32-S3 cipher type
+ *   wifi_cipher - ESP32-S2 cipher type
  *
  * Returned Value:
  *   cipher type
@@ -4364,7 +4359,7 @@ int esp_wifi_notify_subscribe(pid_t pid, struct sigevent *event)
  * Name: esp_wifi_adapter_init
  *
  * Description:
- *   Initialize ESP32-S3 Wi-Fi adapter
+ *   Initialize ESP32-S2 Wi-Fi adapter
  *
  * Input Parameters:
  *   None
