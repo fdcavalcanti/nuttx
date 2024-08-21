@@ -258,6 +258,8 @@ static void esp_dport_access_stall_other_cpu_start(void);
 static void esp_dport_access_stall_other_cpu_end(void);
 static void wifi_apb80m_request(void);
 static void wifi_apb80m_release(void);
+static void esp_phy_enable_wrapper(void);
+static void esp_phy_disable_wrapper(void);
 static int32_t esp_wifi_read_mac(uint8_t *mac, uint32_t type);
 static void esp_timer_arm(void *timer, uint32_t tmout, bool repeat);
 static void esp_timer_disarm(void *timer);
@@ -455,8 +457,8 @@ wifi_osi_funcs_t g_wifi_osi_funcs =
       esp_dport_access_stall_other_cpu_end,
   ._wifi_apb80m_request = wifi_apb80m_request,
   ._wifi_apb80m_release = wifi_apb80m_release,
-  ._phy_disable = esp_phy_disable,
-  ._phy_enable = esp_phy_enable,
+  ._phy_disable = esp_phy_disable_wrapper,
+  ._phy_enable = esp_phy_enable_wrapper,
   ._phy_update_country_info = esp32s2_phy_update_country_info,
   ._phy_common_clock_enable = esp_phy_common_clock_enable,
   ._phy_common_clock_disable = esp_phy_common_clock_disable,
@@ -2414,6 +2416,46 @@ static void wifi_apb80m_release(void)
 #ifdef CONFIG_ESP32S2_AUTO_SLEEP
   esp32s2_pm_lockrelease();
 #endif
+}
+
+/****************************************************************************
+ * Name: esp_phy_enable_wrapper
+ *
+ * Description:
+ *   This is a wrapper for enabling the ESP PHY. It calls the esp_phy_enable
+ *   function with PHY_MODEM_WIFI as the argument.
+ *
+ * Input Parameters:
+ *   None
+ *
+ * Returned Value:
+ *   None
+ *
+ ****************************************************************************/
+
+static void esp_phy_enable_wrapper(void)
+{
+    esp_phy_enable(PHY_MODEM_WIFI);
+}
+
+/****************************************************************************
+ * Name: esp_phy_disable_wrapper
+ *
+ * Description:
+ *   This is a wrapper for disabling the ESP PHY. It first calls the
+ *   phy_wifi_enable_set function with 0 as the argument.
+ *
+ * Input Parameters:
+ *   None
+ *
+ * Returned Value:
+ *   None
+ *
+ ****************************************************************************/
+
+static void esp_phy_disable_wrapper(void)
+{
+    esp_phy_disable(PHY_MODEM_WIFI);
 }
 
 /****************************************************************************
