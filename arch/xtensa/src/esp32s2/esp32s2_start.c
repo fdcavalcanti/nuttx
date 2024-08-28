@@ -55,10 +55,10 @@
 
 #ifdef CONFIG_ESPRESSIF_SIMPLE_BOOT
 #  include "bootloader_init.h"
-#  include "bootloader_random.h"
-#  include "bootloader_soc.h"
 #endif
 
+#include "bootloader_random.h"
+#include "bootloader_soc.h"
 #include "esp_clk_internal.h"
 
 /****************************************************************************
