@@ -436,6 +436,7 @@ SECTIONS
 
   .rtc.data :
   {
+    . = ALIGN(4);
     *(.rtc.data)
     *(.rtc.data.*)
     *(.rtc.rodata)
