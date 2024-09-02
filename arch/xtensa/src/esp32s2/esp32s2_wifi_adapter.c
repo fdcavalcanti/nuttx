@@ -249,10 +249,9 @@ static void *esp_malloc(uint32_t size);
 static void esp_free(void *ptr);
 static uint32_t esp_get_free_heap_size(void);
 static uint32_t esp_rand(void);
-static void esp_dport_access_stall_other_cpu_start(void);
-static void esp_dport_access_stall_other_cpu_end(void);
 static void wifi_apb80m_request(void);
 static void wifi_apb80m_release(void);
+static void IRAM_ATTR esp_empty_wrapper(void);
 static void esp_phy_enable_wrapper(void);
 static void esp_phy_disable_wrapper(void);
 static int32_t esp_wifi_read_mac(uint8_t *mac, uint32_t type);
@@ -264,8 +263,6 @@ static void esp_timer_arm_us(void *timer, uint32_t us, bool repeat);
 static void wifi_reset_mac(void);
 static void wifi_clock_enable(void);
 static void wifi_clock_disable(void);
-static void wifi_rtc_enable_iso(void);
-static void wifi_rtc_disable_iso(void);
 static int64_t esp32s2_timer_get_time(void);
 static int32_t esp_nvs_set_i8(uint32_t handle, const char *key,
                               int8_t value);
@@ -448,17 +445,15 @@ wifi_osi_funcs_t g_wifi_osi_funcs =
   ._event_post = esp_event_post,
   ._get_free_heap_size = esp_get_free_heap_size,
   ._rand = esp_rand,
-  ._dport_access_stall_other_cpu_start_wrap =
-      esp_dport_access_stall_other_cpu_start,
-  ._dport_access_stall_other_cpu_end_wrap =
-      esp_dport_access_stall_other_cpu_end,
+  ._dport_access_stall_other_cpu_start_wrap = esp_empty_wrapper,
+  ._dport_access_stall_other_cpu_end_wrap = esp_empty_wrapper,
   ._wifi_apb80m_request = wifi_apb80m_request,
   ._wifi_apb80m_release = wifi_apb80m_release,
   ._phy_disable = esp_phy_disable_wrapper,
   ._phy_enable = esp_phy_enable_wrapper,
-  ._phy_update_country_info = esp32s2_phy_update_country_info,
   ._phy_common_clock_enable = esp_phy_common_clock_enable,
   ._phy_common_clock_disable = esp_phy_common_clock_disable,
+  ._phy_update_country_info = esp32s2_phy_update_country_info,
   ._read_mac = esp_wifi_read_mac,
   ._timer_arm = esp_timer_arm,
   ._timer_disarm = esp_timer_disarm,
@@ -468,8 +463,8 @@ wifi_osi_funcs_t g_wifi_osi_funcs =
   ._wifi_reset_mac = wifi_reset_mac,
   ._wifi_clock_enable = wifi_clock_enable,
   ._wifi_clock_disable = wifi_clock_disable,
-  ._wifi_rtc_enable_iso = wifi_rtc_enable_iso,
-  ._wifi_rtc_disable_iso = wifi_rtc_disable_iso,
+  ._wifi_rtc_enable_iso = esp_empty_wrapper,
+  ._wifi_rtc_disable_iso = esp_empty_wrapper,
   ._esp_timer_get_time = esp32s2_timer_get_time,
   ._nvs_set_i8 = esp_nvs_set_i8,
   ._nvs_get_i8 = esp_nvs_get_i8,
@@ -523,10 +518,6 @@ wifi_osi_funcs_t g_wifi_osi_funcs =
   ._coex_schm_flexible_period_get = coex_schm_flexible_period_get_wrapper,
   ._magic = ESP_WIFI_OS_ADAPTER_MAGIC,
 };
-
-/* Wi-Fi feature capacity data */
-
-uint64_t g_wifi_feature_caps = CONFIG_FEATURE_WPA3_SAE_BIT;
 
 /* Wi-Fi TAG string data */
 
@@ -2358,36 +2349,6 @@ static uint32_t esp_get_free_heap_size(void)
 }
 
 /****************************************************************************
- * Name: esp_dport_access_stall_other_cpu_start
- *
- * Description:
- *   Don't support
- *
- ****************************************************************************/
-
-static void esp_dport_access_stall_other_cpu_start(void)
-{
-#ifdef CONFIG_SMP
-  DEBUGPANIC();
-#endif
-}
-
-/****************************************************************************
- * Name: esp_dport_access_stall_other_cpu_end
- *
- * Description:
- *   Don't support
- *
- ****************************************************************************/
-
-static void esp_dport_access_stall_other_cpu_end(void)
-{
-#ifdef CONFIG_SMP
-  DEBUGPANIC();
-#endif
-}
-
-/****************************************************************************
  * Name: wifi_apb80m_request
  *
  * Description:
@@ -2415,6 +2376,24 @@ static void wifi_apb80m_release(void)
 #ifdef CONFIG_ESP32S2_AUTO_SLEEP
   esp32s2_pm_lockrelease();
 #endif
+}
+
+/****************************************************************************
+ * Name: esp_empty_wrapper
+ *
+ * Description:
+ *   This is a wrapper for unused functions in ESP WiFi compatibility.
+ *
+ * Input Parameters:
+ *   None
+ *
+ * Returned Value:
+ *   None
+ *
+ ****************************************************************************/
+
+static void IRAM_ATTR esp_empty_wrapper(void)
+{
 }
 
 /****************************************************************************
@@ -2698,30 +2677,6 @@ static void wifi_clock_enable(void)
 static void wifi_clock_disable(void)
 {
   wifi_module_disable();
-}
-
-/****************************************************************************
- * Name: wifi_rtc_enable_iso
- *
- * Description:
- *   Don't support
- *
- ****************************************************************************/
-
-static void wifi_rtc_enable_iso(void)
-{
-}
-
-/****************************************************************************
- * Name: wifi_rtc_disable_iso
- *
- * Description:
- *   Don't support
- *
- ****************************************************************************/
-
-static void wifi_rtc_disable_iso(void)
-{
 }
 
 /****************************************************************************
