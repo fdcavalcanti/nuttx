@@ -345,7 +345,7 @@ static mutex_t g_wifiexcl_lock = NXMUTEX_INITIALIZER;
 
 static int g_wifi_ref;
 
-#ifdef ESP32S2_WLAN_HAS_STA
+#ifdef ESPRESSIF_WLAN_HAS_STA
 
 /* If reconnect automatically */
 
@@ -367,9 +367,9 @@ static wifi_txdone_cb_t g_sta_txdone_cb;
 
 static wifi_config_t g_sta_wifi_cfg;
 
-#endif /* ESP32S2_WLAN_HAS_STA */
+#endif /* ESPRESSIF_WLAN_HAS_STA */
 
-#ifdef ESP32S2_WLAN_HAS_SOFTAP
+#ifdef ESPRESSIF_WLAN_HAS_SOFTAP
 
 /* If Wi-Fi SoftAP starts */
 
@@ -383,7 +383,7 @@ static wifi_txdone_cb_t g_softap_txdone_cb;
 
 static wifi_config_t g_softap_wifi_cfg;
 
-#endif /* ESP32S2_WLAN_HAS_SOFTAP */
+#endif /* ESPRESSIF_WLAN_HAS_SOFTAP */
 
 /* Device specific lock */
 
@@ -2007,7 +2007,7 @@ static int esp_event_id_map(int event_id)
         id = WIFI_ADPT_EVT_SCAN_DONE;
         break;
 
-#ifdef ESP32S2_WLAN_HAS_STA
+#ifdef ESPRESSIF_WLAN_HAS_STA
       case WIFI_EVENT_STA_START:
         id = WIFI_ADPT_EVT_STA_START;
         break;
@@ -2027,9 +2027,9 @@ static int esp_event_id_map(int event_id)
       case WIFI_EVENT_STA_STOP:
         id = WIFI_ADPT_EVT_STA_STOP;
         break;
-#endif /* ESP32S2_WLAN_HAS_STA */
+#endif /* ESPRESSIF_WLAN_HAS_STA */
 
-#ifdef ESP32S2_WLAN_HAS_SOFTAP
+#ifdef ESPRESSIF_WLAN_HAS_SOFTAP
       case WIFI_EVENT_AP_START:
         id = WIFI_ADPT_EVT_AP_START;
         break;
@@ -2045,7 +2045,7 @@ static int esp_event_id_map(int event_id)
       case WIFI_EVENT_AP_STADISCONNECTED:
         id = WIFI_ADPT_EVT_AP_STADISCONNECTED;
         break;
-#endif /* ESP32S2_WLAN_HAS_SOFTAP */
+#endif /* ESPRESSIF_WLAN_HAS_SOFTAP */
 
       default:
         return -1;
@@ -2094,7 +2094,7 @@ static void esp_evt_work_cb(void *arg)
             esp_wifi_scan_event_parse();
             break;
 
-#ifdef ESP32S2_WLAN_HAS_STA
+#ifdef ESPRESSIF_WLAN_HAS_STA
           case WIFI_ADPT_EVT_STA_START:
             wlinfo("Wi-Fi sta start\n");
 
@@ -2152,9 +2152,9 @@ static void esp_evt_work_cb(void *arg)
             wlinfo("Wi-Fi sta stop\n");
             g_sta_connected = false;
             break;
-#endif /* ESP32S2_WLAN_HAS_STA */
+#endif /* ESPRESSIF_WLAN_HAS_STA */
 
-#ifdef ESP32S2_WLAN_HAS_SOFTAP
+#ifdef ESPRESSIF_WLAN_HAS_SOFTAP
           case WIFI_ADPT_EVT_AP_START:
             wlinfo("INFO: Wi-Fi softap start\n");
 
@@ -2188,7 +2188,7 @@ static void esp_evt_work_cb(void *arg)
           case WIFI_ADPT_EVT_AP_STADISCONNECTED:
             wlinfo("INFO: Wi-Fi station leave\n");
             break;
-#endif /* ESP32S2_WLAN_HAS_SOFTAP */
+#endif /* ESPRESSIF_WLAN_HAS_SOFTAP */
           default:
             break;
         }
@@ -3938,7 +3938,7 @@ static unsigned long esp_random_ulong(void)
 static IRAM_ATTR void esp_wifi_tx_done_cb(uint8_t ifidx, uint8_t *data,
                                           uint16_t *len, bool txstatus)
 {
-#ifdef ESP32S2_WLAN_HAS_STA
+#ifdef ESPRESSIF_WLAN_HAS_STA
   if (ifidx == ESP_IF_WIFI_STA)
     {
       if (g_sta_txdone_cb)
@@ -3947,9 +3947,9 @@ static IRAM_ATTR void esp_wifi_tx_done_cb(uint8_t ifidx, uint8_t *data,
         }
     }
   else
-#endif /* ESP32S2_WLAN_HAS_STA */
+#endif /* ESPRESSIF_WLAN_HAS_STA */
 
-#ifdef ESP32S2_WLAN_HAS_SOFTAP
+#ifdef ESPRESSIF_WLAN_HAS_SOFTAP
   if (ifidx == ESP_IF_WIFI_AP)
     {
       if (g_softap_txdone_cb)
@@ -3958,13 +3958,13 @@ static IRAM_ATTR void esp_wifi_tx_done_cb(uint8_t ifidx, uint8_t *data,
         }
     }
   else
-#endif /* ESP32S2_WLAN_HAS_SOFTAP */
+#endif /* ESPRESSIF_WLAN_HAS_SOFTAP */
     {
       wlerr("ifidx=%d is error\n", ifidx);
     }
 }
 
-#ifdef ESP32S2_WLAN_HAS_STA
+#ifdef ESPRESSIF_WLAN_HAS_STA
 
 /****************************************************************************
  * Name: esp_wifi_auth_trans
@@ -4066,7 +4066,7 @@ static int esp_wifi_cipher_trans(uint32_t wifi_cipher)
   return cipher_mode;
 }
 
-#endif /* ESP32S2_WLAN_HAS_STA */
+#endif /* ESPRESSIF_WLAN_HAS_STA */
 
 /****************************************************************************
  * Name: esp_freq_to_channel
@@ -4461,7 +4461,7 @@ errout_init_wifi:
  * Station functions
  ****************************************************************************/
 
-#ifdef ESP32S2_WLAN_HAS_STA
+#ifdef ESPRESSIF_WLAN_HAS_STA
 
 /****************************************************************************
  * Name: esp_wifi_sta_start
@@ -4491,13 +4491,13 @@ int esp_wifi_sta_start(void)
       wlinfo("Failed to stop Wi-Fi ret=%d\n", ret);
     }
 
-#ifdef ESP32S2_WLAN_HAS_SOFTAP
+#ifdef ESPRESSIF_WLAN_HAS_SOFTAP
   if (g_softap_started)
     {
       mode = WIFI_MODE_APSTA;
     }
   else
-#endif /* ESP32S2_WLAN_HAS_SOFTAP */
+#endif /* ESPRESSIF_WLAN_HAS_SOFTAP */
     {
       mode = WIFI_MODE_STA;
     }
@@ -4556,7 +4556,7 @@ int esp_wifi_sta_stop(void)
 
   g_sta_started = false;
 
-#ifdef ESP32S2_WLAN_HAS_SOFTAP
+#ifdef ESPRESSIF_WLAN_HAS_SOFTAP
   if (g_softap_started)
     {
       ret = esp_wifi_set_mode(WIFI_MODE_AP);
@@ -4575,13 +4575,13 @@ int esp_wifi_sta_stop(void)
           goto errout;
         }
     }
-#endif /* ESP32S2_WLAN_HAS_SOFTAP */
+#endif /* ESPRESSIF_WLAN_HAS_SOFTAP */
 
   wlinfo("OK to stop Wi-Fi station\n");
 
-#ifdef ESP32S2_WLAN_HAS_SOFTAP
+#ifdef ESPRESSIF_WLAN_HAS_SOFTAP
 errout:
-#endif /* ESP32S2_WLAN_HAS_SOFTAP */
+#endif /* ESPRESSIF_WLAN_HAS_SOFTAP */
 
   esp_wifi_lock(false);
   return ret;
@@ -5456,7 +5456,7 @@ int esp_wifi_sta_bitrate(struct iwreq *iwr, bool set)
   return OK;
 }
 
-#endif /* ESP32S2_WLAN_HAS_STA */
+#endif /* ESPRESSIF_WLAN_HAS_STA */
 
 /****************************************************************************
  * Name: esp_wifi_sta_get_txpower
@@ -5651,7 +5651,7 @@ int esp_wifi_sta_country(struct iwreq *iwr, bool set)
   return OK;
 }
 
-#ifdef ESP32S2_WLAN_HAS_STA
+#ifdef ESPRESSIF_WLAN_HAS_STA
 
 /****************************************************************************
  * Name: esp_wifi_sta_rssi
@@ -5698,13 +5698,13 @@ int esp_wifi_sta_rssi(struct iwreq *iwr, bool set)
 
   return OK;
 }
-#endif /* ESP32S2_WLAN_HAS_STA */
+#endif /* ESPRESSIF_WLAN_HAS_STA */
 
 /****************************************************************************
  * SoftAP functions
  ****************************************************************************/
 
-#ifdef ESP32S2_WLAN_HAS_SOFTAP
+#ifdef ESPRESSIF_WLAN_HAS_SOFTAP
 
 /****************************************************************************
  * Name: esp_wifi_softap_start
@@ -5734,13 +5734,13 @@ int esp_wifi_softap_start(void)
       wlinfo("Failed to stop Wi-Fi ret=%d\n", ret);
     }
 
-#ifdef ESP32S2_WLAN_HAS_STA
+#ifdef ESPRESSIF_WLAN_HAS_STA
   if (g_sta_started)
     {
       mode = WIFI_MODE_APSTA;
     }
   else
-#endif /* ESP32S2_WLAN_HAS_STA */
+#endif /* ESPRESSIF_WLAN_HAS_STA */
     {
       mode = WIFI_MODE_AP;
     }
@@ -5799,7 +5799,7 @@ int esp_wifi_softap_stop(void)
 
   g_softap_started = false;
 
-#ifdef ESP32S2_WLAN_HAS_STA
+#ifdef ESPRESSIF_WLAN_HAS_STA
   if (g_sta_started)
     {
       ret = esp_wifi_set_mode(WIFI_MODE_STA);
@@ -5818,13 +5818,13 @@ int esp_wifi_softap_stop(void)
           goto errout;
         }
     }
-#endif /* ESP32S2_WLAN_HAS_STA */
+#endif /* ESPRESSIF_WLAN_HAS_STA */
 
   wlinfo("OK to stop Wi-Fi SoftAP\n");
 
-#ifdef ESP32S2_WLAN_HAS_STA
+#ifdef ESPRESSIF_WLAN_HAS_STA
 errout:
-#endif /* ESP32S2_WLAN_HAS_STA */
+#endif /* ESPRESSIF_WLAN_HAS_STA */
 
   esp_wifi_lock(false);
   return ret;
@@ -6463,7 +6463,7 @@ int esp_wifi_softap_rssi(struct iwreq *iwr, bool set)
   return -ENOSYS;
 }
 
-#endif /* ESP32S2_WLAN_HAS_SOFTAP */
+#endif /* ESPRESSIF_WLAN_HAS_SOFTAP */
 
 /****************************************************************************
  * Name: esp_wifi_stop_callback

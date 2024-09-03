@@ -45,10 +45,16 @@ extern "C"
 #ifdef CONFIG_ESP32S2_WIFI
 
 /****************************************************************************
+ * Pre-processor Definitions
+ ****************************************************************************/
+
+#
+
+/****************************************************************************
  * Public Function Prototypes
  ****************************************************************************/
 
-#ifdef ESP32S2_WLAN_HAS_STA
+#ifdef ESPRESSIF_WLAN_HAS_STA
 
 /****************************************************************************
  * Name: esp_wlan_sta_set_linkstatus
@@ -83,7 +89,7 @@ int esp_wlan_sta_set_linkstatus(bool linkstatus);
  ****************************************************************************/
 
 int esp_wlan_sta_initialize(void);
-#endif /* ESP32S2_WLAN_HAS_STA */
+#endif /* ESPRESSIF_WLAN_HAS_STA */
 
 /****************************************************************************
  * Name: esp32s2_wlan_softap_initialize
@@ -99,9 +105,9 @@ int esp_wlan_sta_initialize(void);
  *
  ****************************************************************************/
 
-#ifdef ESP32S2_WLAN_HAS_SOFTAP
+#ifdef ESPRESSIF_WLAN_HAS_SOFTAP
 int esp_wlan_softap_initialize(void);
-#endif /* ESP32S2_WLAN_HAS_SOFTAP */
+#endif /* ESPRESSIF_WLAN_HAS_SOFTAP */
 
 #endif /* CONFIG_ESP32S2_WIFI */
 #ifdef __cplusplus

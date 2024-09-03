@@ -49,13 +49,33 @@
 
 #include "espressif/esp_wlan.h"
 #include "espressif/esp_wifi_utils.h"
-#include "esp32s2_wifi_adapter.h"
 #include "espressif/esp_wireless.h"
-#include "esp32s2_systemreset.h"
+
+#ifdef CONFIG_ARCH_CHIP_ESP32
+#  include "esp32_wifi_adapter.h"
+#  include "esp32_systemreset.h"
+#elif CONFIG_ARCH_CHIP_ESP32S2
+#  include "esp32s2_wifi_adapter.h"
+#  include "esp32s2_systemreset.h"
+#elif CONFIG_ARCH_CHIP_ESP32S3
+#  include "esp32s3_wifi_adapter.h"
+#  include "esp32s3_systemreset.h"
+#endif
 
 /****************************************************************************
  * Pre-processor Definitions
  ****************************************************************************/
+
+#ifdef CONFIG_ARCH_CHIP_ESP32
+#  define esp_register_shutdown_handler esp32_register_shutdown_handler
+#  define esp_unregister_shutdown_handler esp32_unregister_shutdown_handler
+#elif CONFIG_ARCH_CHIP_ESP32S2
+#  define esp_register_shutdown_handler esp32s2_register_shutdown_handler
+#  define esp_unregister_shutdown_handler esp32s2_unregister_shutdown_handler
+#elif CONFIG_ARCH_CHIP_ESP32S3
+#  define esp_register_shutdown_handler esp32s3_register_shutdown_handler
+#  define esp_unregister_shutdown_handler esp32s3_unregister_shutdown_handler
+#endif
 
 /* TX timeout = 1 minute */
 
@@ -183,9 +203,9 @@ struct wlan_priv_s
 
 static uint8_t g_callback_register_ref;
 
-static struct wlan_priv_s g_wlan_priv[ESP32S2_WLAN_DEVS];
+static struct wlan_priv_s g_wlan_priv[ESPRESSIF_WLAN_DEVS];
 
-#ifdef ESP32S2_WLAN_HAS_STA
+#ifdef ESPRESSIF_WLAN_HAS_STA
 static const struct wlan_ops g_sta_ops =
 {
   .start      = esp_wifi_sta_start,
@@ -206,9 +226,9 @@ static const struct wlan_ops g_sta_ops =
   .event      = esp_wifi_notify_subscribe,
   .stop       = esp_wifi_sta_stop
 };
-#endif /* ESP32S2_WLAN_HAS_STA */
+#endif /* ESPRESSIF_WLAN_HAS_STA */
 
-#ifdef ESP32S2_WLAN_HAS_SOFTAP
+#ifdef ESPRESSIF_WLAN_HAS_SOFTAP
 static const struct wlan_ops g_softap_ops =
 {
   .start      = esp_wifi_softap_start,
@@ -229,7 +249,7 @@ static const struct wlan_ops g_softap_ops =
   .event      = esp_wifi_notify_subscribe,
   .stop       = esp_wifi_softap_stop
 };
-#endif /* ESP32S2_WLAN_HAS_SOFTAP */
+#endif /* ESPRESSIF_WLAN_HAS_SOFTAP */
 
 /****************************************************************************
  * Private Function Prototypes
@@ -1084,7 +1104,7 @@ static int wlan_ifup(struct net_driver_s *dev)
   priv->ifup = true;
   if (g_callback_register_ref == 0)
     {
-      ret = esp32s2_register_shutdown_handler(esp_wifi_stop_callback);
+      ret = esp_register_shutdown_handler(esp_wifi_stop_callback);
       if (ret < 0)
         {
           nwarn("WARN: Failed to register handler ret=%d\n", ret);
@@ -1141,7 +1161,7 @@ static int wlan_ifdown(struct net_driver_s *dev)
   --g_callback_register_ref;
   if (g_callback_register_ref == 0)
     {
-      ret = esp32s2_unregister_shutdown_handler(esp_wifi_stop_callback);
+      ret = esp_unregister_shutdown_handler(esp_wifi_stop_callback);
       if (ret < 0)
         {
           nwarn("WARN: Failed to unregister handler ret=%d\n", ret);
@@ -1437,7 +1457,7 @@ static int wlan_ioctl(struct net_driver_s *dev,
 #endif /* CONFIG_NETDEV_IOCTL */
 
 /****************************************************************************
- * Name: esp32s2_net_initialize
+ * Name: esp_net_initialize
  *
  * Description:
  *   Initialize the ESP32-S2 driver
@@ -1451,7 +1471,7 @@ static int wlan_ioctl(struct net_driver_s *dev,
  *
  ****************************************************************************/
 
-static int esp32s2_net_initialize(int devno, uint8_t *mac_addr,
+static int esp_net_initialize(int devno, uint8_t *mac_addr,
                                   const struct wlan_ops *ops)
 {
   int ret;
@@ -1521,10 +1541,10 @@ static int esp32s2_net_initialize(int devno, uint8_t *mac_addr,
  *
  ****************************************************************************/
 
-#ifdef ESP32S2_WLAN_HAS_STA
+#ifdef ESPRESSIF_WLAN_HAS_STA
 static int wlan_sta_rx_done(void *buffer, uint16_t len, void *eb)
 {
-  struct wlan_priv_s *priv = &g_wlan_priv[ESP32S2_WLAN_STA_DEVNO];
+  struct wlan_priv_s *priv = &g_wlan_priv[ESPRESSIF_WLAN_STA_DEVNO];
 
   return wlan_rx_done(priv, buffer, len, eb);
 }
@@ -1548,11 +1568,11 @@ static int wlan_sta_rx_done(void *buffer, uint16_t len, void *eb)
 
 static void wlan_sta_tx_done(uint8_t *data, uint16_t *len, bool status)
 {
-  struct wlan_priv_s *priv = &g_wlan_priv[ESP32S2_WLAN_STA_DEVNO];
+  struct wlan_priv_s *priv = &g_wlan_priv[ESPRESSIF_WLAN_STA_DEVNO];
 
   wlan_tx_done(priv);
 }
-#endif /* ESP32S2_WLAN_HAS_STA */
+#endif /* ESPRESSIF_WLAN_HAS_STA */
 
 /****************************************************************************
  * Function: wlan_softap_rx_done
@@ -1571,10 +1591,10 @@ static void wlan_sta_tx_done(uint8_t *data, uint16_t *len, bool status)
  *
  ****************************************************************************/
 
-#ifdef ESP32S2_WLAN_HAS_SOFTAP
+#ifdef ESPRESSIF_WLAN_HAS_SOFTAP
 static int wlan_softap_rx_done(void *buffer, uint16_t len, void *eb)
 {
-  struct wlan_priv_s *priv = &g_wlan_priv[ESP32S2_WLAN_SOFTAP_DEVNO];
+  struct wlan_priv_s *priv = &g_wlan_priv[ESPRESSIF_WLAN_SOFTAP_DEVNO];
 
   return wlan_rx_done(priv, buffer, len, eb);
 }
@@ -1599,11 +1619,11 @@ static int wlan_softap_rx_done(void *buffer, uint16_t len, void *eb)
 
 static void wlan_softap_tx_done(uint8_t *data, uint16_t *len, bool status)
 {
-  struct wlan_priv_s *priv = &g_wlan_priv[ESP32S2_WLAN_SOFTAP_DEVNO];
+  struct wlan_priv_s *priv = &g_wlan_priv[ESPRESSIF_WLAN_SOFTAP_DEVNO];
 
   wlan_tx_done(priv);
 }
-#endif /* ESP32S2_WLAN_HAS_SOFTAP */
+#endif /* ESPRESSIF_WLAN_HAS_SOFTAP */
 
 /****************************************************************************
  * Public Functions
@@ -1625,10 +1645,10 @@ static void wlan_softap_tx_done(uint8_t *data, uint16_t *len, bool status)
  *
  ****************************************************************************/
 
-#ifdef ESP32S2_WLAN_HAS_STA
+#ifdef ESPRESSIF_WLAN_HAS_STA
 int esp_wlan_sta_set_linkstatus(bool linkstatus)
 {
-  struct wlan_priv_s *priv = &g_wlan_priv[ESP32S2_WLAN_STA_DEVNO];
+  struct wlan_priv_s *priv = &g_wlan_priv[ESPRESSIF_WLAN_STA_DEVNO];
 
   if (linkstatus)
     {
@@ -1679,7 +1699,8 @@ int esp_wlan_sta_initialize(void)
         eth_mac[0], eth_mac[1], eth_mac[2],
         eth_mac[3], eth_mac[4], eth_mac[5]);
 
-  ret = esp32s2_net_initialize(ESP32S2_WLAN_STA_DEVNO, eth_mac, &g_sta_ops);
+  ret = esp_net_initialize(ESPRESSIF_WLAN_STA_DEVNO,
+                               eth_mac, &g_sta_ops);
   if (ret < 0)
     {
       nerr("ERROR: Failed to initialize net\n");
@@ -1699,7 +1720,7 @@ int esp_wlan_sta_initialize(void)
 
   return OK;
 }
-#endif /* ESP32S2_WLAN_HAS_STA */
+#endif /* ESPRESSIF_WLAN_HAS_STA */
 
 /****************************************************************************
  * Name: esp_wlan_softap_initialize
@@ -1715,7 +1736,7 @@ int esp_wlan_sta_initialize(void)
  *
  ****************************************************************************/
 
-#ifdef ESP32S2_WLAN_HAS_SOFTAP
+#ifdef ESPRESSIF_WLAN_HAS_SOFTAP
 int esp_wlan_softap_initialize(void)
 {
   int ret;
@@ -1739,7 +1760,7 @@ int esp_wlan_softap_initialize(void)
         eth_mac[0], eth_mac[1], eth_mac[2],
         eth_mac[3], eth_mac[4], eth_mac[5]);
 
-  ret = esp32s2_net_initialize(ESP32S2_WLAN_SOFTAP_DEVNO, eth_mac,
+  ret = esp_net_initialize(ESPRESSIF_WLAN_SOFTAP_DEVNO, eth_mac,
                              &g_softap_ops);
   if (ret < 0)
     {
@@ -1760,6 +1781,6 @@ int esp_wlan_softap_initialize(void)
 
   return OK;
 }
-#endif /* ESP32S2_WLAN_HAS_SOFTAP */
+#endif /* ESPRESSIF_WLAN_HAS_SOFTAP */
 
 #endif /* CONFIG_ESP32S2_WIFI */

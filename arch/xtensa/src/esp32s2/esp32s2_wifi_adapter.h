@@ -46,19 +46,19 @@ extern "C"
  ****************************************************************************/
 
 #if defined(CONFIG_ESP32S2_WIFI_STATION)
-#  define ESP32S2_WLAN_HAS_STA
-#  define ESP32S2_WLAN_STA_DEVNO    0
-#  define ESP32S2_WLAN_DEVS         1
+#  define ESPRESSIF_WLAN_HAS_STA
+#  define ESPRESSIF_WLAN_STA_DEVNO    0
+#  define ESPRESSIF_WLAN_DEVS         1
 #elif defined(CONFIG_ESP32S2_WIFI_SOFTAP)
-#  define ESP32S2_WLAN_HAS_SOFTAP
-#  define ESP32S2_WLAN_SOFTAP_DEVNO 0
-#  define ESP32S2_WLAN_DEVS         1
+#  define ESPRESSIF_WLAN_HAS_SOFTAP
+#  define ESPRESSIF_WLAN_SOFTAP_DEVNO 0
+#  define ESPRESSIF_WLAN_DEVS         1
 #elif defined(CONFIG_ESP32S2_WIFI_STATION_SOFTAP)
-#  define ESP32S2_WLAN_HAS_STA
-#  define ESP32S2_WLAN_HAS_SOFTAP
-#  define ESP32S2_WLAN_STA_DEVNO    0
-#  define ESP32S2_WLAN_SOFTAP_DEVNO 1
-#  define ESP32S2_WLAN_DEVS         2
+#  define ESPRESSIF_WLAN_HAS_STA
+#  define ESPRESSIF_WLAN_HAS_SOFTAP
+#  define ESPRESSIF_WLAN_STA_DEVNO    0
+#  define ESPRESSIF_WLAN_SOFTAP_DEVNO 1
+#  define ESPRESSIF_WLAN_DEVS         2
 #endif
 
 #define SSID_MAX_LEN                (32)
@@ -148,7 +148,7 @@ void esp_wifi_free_eb(void *eb);
 
 int esp_wifi_notify_subscribe(pid_t pid, struct sigevent *event);
 
-#ifdef ESP32S2_WLAN_HAS_STA
+#ifdef ESPRESSIF_WLAN_HAS_STA
 
 /****************************************************************************
  * Name: esp_wifi_sta_start
@@ -484,9 +484,9 @@ int esp_wifi_sta_country(struct iwreq *iwr, bool set);
  ****************************************************************************/
 
 int esp_wifi_sta_rssi(struct iwreq *iwr, bool set);
-#endif /* ESP32S2_WLAN_HAS_STA */
+#endif /* ESPRESSIF_WLAN_HAS_STA */
 
-#ifdef ESP32S2_WLAN_HAS_SOFTAP
+#ifdef ESPRESSIF_WLAN_HAS_SOFTAP
 
 /****************************************************************************
  * Name: esp_wifi_softap_start
@@ -822,7 +822,7 @@ int esp_wifi_softap_country(struct iwreq *iwr, bool set);
  ****************************************************************************/
 
 int esp_wifi_softap_rssi(struct iwreq *iwr, bool set);
-#endif /* ESP32S2_WLAN_HAS_SOFTAP */
+#endif /* ESPRESSIF_WLAN_HAS_SOFTAP */
 
 /****************************************************************************
  * Name: esp_wifi_stop_callback
