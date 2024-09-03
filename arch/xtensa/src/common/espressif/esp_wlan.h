@@ -42,7 +42,7 @@ extern "C"
 #define EXTERN extern
 #endif
 
-#ifdef CONFIG_ESP32S2_WIFI
+#ifdef CONFIG_ESPRESSIF_WIFI
 
 /****************************************************************************
  * Pre-processor Definitions
@@ -109,7 +109,7 @@ int esp_wlan_sta_initialize(void);
 int esp_wlan_softap_initialize(void);
 #endif /* ESPRESSIF_WLAN_HAS_SOFTAP */
 
-#endif /* CONFIG_ESP32S2_WIFI */
+#endif /* CONFIG_ESPRESSIF_WIFI */
 #ifdef __cplusplus
 }
 #endif

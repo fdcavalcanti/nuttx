@@ -83,7 +83,7 @@
 
 #define PHY_RF_MASK   ((1 << PHY_BT_MODULE) | (1 << PHY_WIFI_MODULE))
 
-#define WIFI_CONNECT_TIMEOUT  CONFIG_ESP32S2_WIFI_CONNECT_TIMEOUT
+#define WIFI_CONNECT_TIMEOUT  CONFIG_ESPRESSIF_WIFI_CONNECT_TIMEOUT
 
 #define TIMER_INITIALIZED_VAL (0x5aa5a55a)
 
@@ -4402,28 +4402,28 @@ int esp_wifi_adapter_init(void)
 
   wifi_cfg.nvs_enable = 0;
 
-#ifdef CONFIG_ESP32S2_WIFI_TX_AMPDU
+#ifdef CONFIG_ESPRESSIF_WIFI_TX_AMPDU
   wifi_cfg.ampdu_tx_enable = 1;
 #else
   wifi_cfg.ampdu_tx_enable = 0;
 #endif
 
-#ifdef CONFIG_ESP32S2_WIFI_RX_AMPDU
+#ifdef CONFIG_ESPRESSIF_WIFI_RX_AMPDU
   wifi_cfg.ampdu_rx_enable = 1;
 #else
   wifi_cfg.ampdu_rx_enable = 0;
 #endif
 
-#ifdef CONFIG_ESP32S2_WIFI_STA_DISCONNECT_PM
+#ifdef CONFIG_ESPRESSIF_WIFI_STA_DISCONNECT_PM
   wifi_cfg.sta_disconnected_pm = true;
 #else
   wifi_cfg.sta_disconnected_pm = false;
 #endif
 
-  wifi_cfg.rx_ba_win          = CONFIG_ESP32S2_WIFI_RXBA_AMPDU_WZ;
-  wifi_cfg.static_rx_buf_num  = CONFIG_ESP32S2_WIFI_STATIC_RXBUF_NUM;
-  wifi_cfg.dynamic_rx_buf_num = CONFIG_ESP32S2_WIFI_DYNAMIC_RXBUF_NUM;
-  wifi_cfg.dynamic_tx_buf_num = CONFIG_ESP32S2_WIFI_DYNAMIC_TXBUF_NUM;
+  wifi_cfg.rx_ba_win          = CONFIG_ESPRESSIF_WIFI_RXBA_AMPDU_WZ;
+  wifi_cfg.static_rx_buf_num  = CONFIG_ESPRESSIF_WIFI_STATIC_RXBUF_NUM;
+  wifi_cfg.dynamic_rx_buf_num = CONFIG_ESPRESSIF_WIFI_DYNAMIC_RXBUF_NUM;
+  wifi_cfg.dynamic_tx_buf_num = CONFIG_ESPRESSIF_WIFI_DYNAMIC_TXBUF_NUM;
 
   ret = esp_wifi_init(&wifi_cfg);
   if (ret)

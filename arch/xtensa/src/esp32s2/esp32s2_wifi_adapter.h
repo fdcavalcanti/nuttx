@@ -45,15 +45,15 @@ extern "C"
  * Pre-processor Definitions
  ****************************************************************************/
 
-#if defined(CONFIG_ESP32S2_WIFI_STATION)
+#if defined(CONFIG_ESPRESSIF_WIFI_STATION)
 #  define ESPRESSIF_WLAN_HAS_STA
 #  define ESPRESSIF_WLAN_STA_DEVNO    0
 #  define ESPRESSIF_WLAN_DEVS         1
-#elif defined(CONFIG_ESP32S2_WIFI_SOFTAP)
+#elif defined(CONFIG_ESPRESSIF_WIFI_SOFTAP)
 #  define ESPRESSIF_WLAN_HAS_SOFTAP
 #  define ESPRESSIF_WLAN_SOFTAP_DEVNO 0
 #  define ESPRESSIF_WLAN_DEVS         1
-#elif defined(CONFIG_ESP32S2_WIFI_STATION_SOFTAP)
+#elif defined(CONFIG_ESPRESSIF_WIFI_STATION_SOFTAP)
 #  define ESPRESSIF_WLAN_HAS_STA
 #  define ESPRESSIF_WLAN_HAS_SOFTAP
 #  define ESPRESSIF_WLAN_STA_DEVNO    0

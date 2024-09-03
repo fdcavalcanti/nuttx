@@ -24,7 +24,7 @@
 
 #include <nuttx/config.h>
 
-#ifdef CONFIG_ESP32S2_WIFI
+#ifdef CONFIG_ESPRESSIF_WIFI
 
 #include <assert.h>
 #include <errno.h>
@@ -99,7 +99,7 @@
 
 /* WLAN packet buffer number */
 
-#define WLAN_PKTBUF_NUM           (CONFIG_ESP32S2_WLAN_PKTBUF_NUM)
+#define WLAN_PKTBUF_NUM           (CONFIG_ESPRESSIF_WLAN_PKTBUF_NUM)
 
 /* Receive threshold which allows the receive function to trigger a scheduler
  * to activate the application if possible.
@@ -1783,4 +1783,4 @@ int esp_wlan_softap_initialize(void)
 }
 #endif /* ESPRESSIF_WLAN_HAS_SOFTAP */
 
-#endif /* CONFIG_ESP32S2_WIFI */
+#endif /* CONFIG_ESPRESSIF_WIFI */

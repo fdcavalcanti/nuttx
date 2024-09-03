@@ -31,7 +31,7 @@ EXTRA_LIBS += -lphy
 
 # CHIP_CSRCS += esp32s2_wireless.c
 
-ifeq ($(CONFIG_ESP32S2_WIFI),y)
+ifeq ($(CONFIG_ESPRESSIF_WIFI),y)
 # CHIP_CSRCS += esp32s2_wlan.c esp32s2_wifi_utils.c esp32s2_wifi_adapter.c
 CHIP_CSRCS += esp32s2_wifi_adapter.c
 EXTRA_LIBS += -lcore -lnet80211 -lpp

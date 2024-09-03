@@ -466,7 +466,7 @@ config ESP32S2_UART1
 	select UART1_SERIALDRIVER
 	select ARCH_HAVE_SERIAL_TERMIOS
 
-config ESP32S2_WIRELESS
+config ESPRESSIF_WIRELESS
 	bool
 	default n
 	select NET
@@ -477,10 +477,10 @@ config ESP32S2_WIRELESS
 	---help---
 		Enable Wireless support
 
-config ESP32S2_WIFI
+config ESPRESSIF_WIFI
 	bool "Wi-Fi"
 	default n
-	select ESP32S2_WIRELESS
+	select ESPRESSIF_WIRELESS
 	---help---
 		Enable Wi-Fi support
 
@@ -817,7 +817,7 @@ config ESP32S2_I2CTIMEOMS
 endmenu # I2C Configuration
 
 menu "Wi-Fi Configuration"
-	depends on ESP32S2_WIFI
+	depends on ESPRESSIF_WIFI
 
 menu "ESP WPA-Supplicant"
 
@@ -850,17 +850,17 @@ config ESP_WPA_DEBUG_PRINT
 
 endmenu # ESP WPA-Supplicant
 
-choice
+choice ESPRESSIF_WIFI_MODE
 	prompt "ESP32S2 Wi-Fi mode"
-	default ESP32S2_WIFI_STATION
+	default ESPRESSIF_WIFI_STATION
 
-config ESP32S2_WIFI_STATION
+config ESPRESSIF_WIFI_STATION
 	bool "Station mode"
 
-config ESP32S2_WIFI_SOFTAP
+config ESPRESSIF_WIFI_SOFTAP
 	bool "SoftAP mode"
 
-config ESP32S2_WIFI_STATION_SOFTAP
+config ESPRESSIF_WIFI_STATION_SOFTAP
 	bool "Station + SoftAP"
 
 endchoice # ESP32S2 Wi-Fi mode
@@ -879,31 +879,31 @@ config ESP_WIFI_ENABLE_WPA3_OWE_STA
 		PMF (Protected Management Frames) is a prerequisite feature for a WPA3 connection, it needs to be
 		explicitly configured before attempting connection. Please refer to the Wi-Fi Driver API Guide for details.
 
-config ESP32S2_WIFI_STATIC_RXBUF_NUM
+config ESPRESSIF_WIFI_STATIC_RXBUF_NUM
 	int "Wi-Fi static RX buffer number"
 	default 10
 
-config ESP32S2_WIFI_DYNAMIC_RXBUF_NUM
+config ESPRESSIF_WIFI_DYNAMIC_RXBUF_NUM
 	int "Wi-Fi dynamic RX buffer number"
 	default 32
 
-config ESP32S2_WIFI_DYNAMIC_TXBUF_NUM
+config ESPRESSIF_WIFI_DYNAMIC_TXBUF_NUM
 	int "Wi-Fi dynamic TX buffer number"
 	default 32
 
-config ESP32S2_WIFI_TX_AMPDU
+config ESPRESSIF_WIFI_TX_AMPDU
 	bool "Wi-Fi TX AMPDU"
 	default y
 
-config ESP32S2_WIFI_RX_AMPDU
+config ESPRESSIF_WIFI_RX_AMPDU
 	bool "Wi-Fi RX AMPDU"
 	default y
 
-config ESP32S2_WIFI_RXBA_AMPDU_WZ
+config ESPRESSIF_WIFI_RXBA_AMPDU_WZ
 	int "Wi-Fi RX BA AMPDU windown size"
 	default 6
 
-config ESP32S2_WLAN_PKTBUF_NUM
+config ESPRESSIF_WLAN_PKTBUF_NUM
 	int "WLAN netcard packet buffer number per netcard"
 	default 16
 
@@ -919,19 +919,19 @@ config ESP_WIFI_GMAC_SUPPORT
 	---help---
 		Select this option to enable GMAC support. GMAC support is compulsory for WiFi 192-bit certification.
 
-config ESP32S2_WIFI_CONNECT_TIMEOUT
+config ESPRESSIF_WIFI_CONNECT_TIMEOUT
 	int "Connect timeout in second"
 	default 10
 	---help---
 		Max waiting time of connecting to AP.
 
-config ESP32S2_WIFI_SCAN_RESULT_SIZE
+config ESPRESSIF_WIFI_SCAN_RESULT_SIZE
 	int "Scan result buffer"
 	default 4096
 	---help---
 		Maximum scan result buffer size.
 
-config ESP32S2_WIFI_STA_DISCONNECT_PM
+config ESPRESSIF_WIFI_STA_DISCONNECT_PM
 	bool "Power Management for station when disconnected"
 	default y
 	---help---
@@ -956,7 +956,7 @@ choice ESP32S2_POWER_SAVE_MODE
 		In maximum power-saving mode, station wakes up in every listen interval to receive beacon. This listen interval
 		can be set to be longer than the AP DTIM period. Broadcast data may be lost because station may be in sleep
 		state at DTIM time. If listen interval is longer, more power is saved, but broadcast data is more easy to lose.
-		Listen interval can be configured by setting ESP32S2_WIFI_LISTEN_INTERVAL.
+		Listen interval can be configured by setting ESPRESSIF_WIFI_LISTEN_INTERVAL.
 
 		ESP32S2_POWER_SAVE_NONE disables Modem-sleep mode entirely. Disabling it increases power consumption, but
 		minimizes the delay in receiving Wi-Fi data in real time. When Modem-sleep mode is enabled, the delay in
@@ -974,7 +974,7 @@ config ESP32S2_POWER_SAVE_MAX_MODEM
 
 endchoice # ESP32S2_POWER_SAVE_MODE
 
-config ESP32S2_WIFI_LISTEN_INTERVAL
+config ESPRESSIF_WIFI_LISTEN_INTERVAL
 	int "Wi-Fi listen interval"
 	depends on ESP32S2_POWER_SAVE_MAX_MODEM
 	default 3
@@ -983,7 +983,7 @@ config ESP32S2_WIFI_LISTEN_INTERVAL
 		For example, if beacon interval is 100 ms and listen interval is 3, the interval for station to listen
 		to beacon is 300 ms.
 
-endmenu # ESP32S2_WIFI
+endmenu # ESPRESSIF_WIFI
 
 menu "TWAI driver options"
 	depends on ESP32S2_TWAI

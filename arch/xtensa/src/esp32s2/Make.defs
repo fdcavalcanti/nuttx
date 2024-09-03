@@ -181,7 +181,7 @@ include common/espressif/Make.defs
 include chip/Bootloader.mk
 
 context:: chip/$(ESP_HAL_3RDPARTY_REPO)
-ifeq ($(CONFIG_ESP32S2_WIRELESS),y)
+ifeq ($(CONFIG_ESPRESSIF_WIRELESS),y)
 	$(Q) echo "Espressif HAL for 3rd Party Platforms: initializing submodules..."
 	$(Q) git -C chip/$(ESP_HAL_3RDPARTY_REPO) submodule --quiet update --init $(GIT_DEPTH_PARAMETER) components/mbedtls/mbedtls components/esp_phy/lib components/esp_wifi/lib
 	$(Q) git -C chip/$(ESP_HAL_3RDPARTY_REPO)/components/mbedtls/mbedtls reset --quiet --hard
@@ -189,7 +189,7 @@ ifeq ($(CONFIG_ESP32S2_WIRELESS),y)
 	$(Q) cd chip/$(ESP_HAL_3RDPARTY_REPO)/components/mbedtls/mbedtls && git apply ../../../nuttx/patches/components/mbedtls/mbedtls/*.patch
 endif
 
-ifeq ($(CONFIG_ESP32S2_WIRELESS),y)
+ifeq ($(CONFIG_ESPRESSIF_WIRELESS),y)
 include chip/Wireless.mk
 endif
 

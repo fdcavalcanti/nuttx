@@ -50,7 +50,7 @@
 #  include "esp32s2_tim_lowerhalf.h"
 #endif
 
-#ifdef CONFIG_ESP32S2_WIFI
+#ifdef CONFIG_ESPRESSIF_WIFI
 #  include "esp32s2_board_wlan.h"
 #endif
 
@@ -306,9 +306,9 @@ int esp32s2_bringup(void)
     }
 #endif
 
-#ifdef CONFIG_ESP32S2_WIRELESS
+#ifdef CONFIG_ESPRESSIF_WIRELESS
 
-#ifdef CONFIG_ESP32S2_WIFI
+#ifdef CONFIG_ESPRESSIF_WIFI
   ret = board_wlan_init();
   if (ret < 0)
     {

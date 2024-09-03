@@ -57,7 +57,7 @@
 #endif
 
 #include "esp_private/phy.h"
-#ifdef CONFIG_ESP32S2_WIFI
+#ifdef CONFIG_ESPRESSIF_WIFI
 #  include "esp_private/wifi.h"
 #  include "esp_wpa.h"
 #endif
@@ -362,7 +362,7 @@ static int esp_swi_irq(int irq, void *context, void *arg)
   return OK;
 }
 
-#ifdef CONFIG_ESP32S2_WIFI
+#ifdef CONFIG_ESPRESSIF_WIFI
 
 /****************************************************************************
  * Name: esp_wifi_set_log_level
@@ -395,7 +395,7 @@ static void esp_wifi_set_log_level(void)
 
   esp_wifi_internal_set_log_level(wifi_log_level);
 }
-#endif /* CONFIG_ESP32S2_WIFI */
+#endif /* CONFIG_ESPRESSIF_WIFI */
 
 /****************************************************************************
  * Public Functions
@@ -1481,7 +1481,7 @@ int esp_wireless_deinit(void)
   return OK;
 }
 
-#ifdef CONFIG_ESP32S2_WIFI
+#ifdef CONFIG_ESPRESSIF_WIFI
 
 /****************************************************************************
  * Name: esp_wifi_init
@@ -1592,4 +1592,4 @@ int32_t esp_wifi_deinit(void)
 
   return ret;
 }
-#endif /* CONFIG_ESP32S2_WIFI */
+#endif /* CONFIG_ESPRESSIF_WIFI */
