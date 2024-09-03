@@ -1,5 +1,5 @@
 /****************************************************************************
- * arch/xtensa/src/esp32s2/esp32s2_wifi_utils.h
+ * arch/xtensa/src/common/espressif/esp_wifi_utils.h
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -22,8 +22,8 @@
  * Included Files
  ****************************************************************************/
 
-#ifndef __ARCH_XTENSA_SRC_ESP32S2_ESP32S2_WIFI_UTILS_H
-#define __ARCH_XTENSA_SRC_ESP32S2_ESP32S2_WIFI_UTILS_H
+#ifndef __ARCH_XTENSA_SRC_COMMON_ESPRESSIF_ESP_WIFI_UTILS_H
+#define __ARCH_XTENSA_SRC_COMMON_ESPRESSIF_ESP_WIFI_UTILS_H
 
 #include <nuttx/config.h>
 #include <nuttx/net/netdev.h>
@@ -101,4 +101,4 @@ void esp_wifi_scan_event_parse(void);
 #undef EXTERN
 
 #endif /* __ASSEMBLY__ */
-#endif /* __ARCH_XTENSA_SRC_ESP32S2_ESP32S2_WIFI_UTILS_H */
+#endif /* __ARCH_XTENSA_SRC_COMMON_ESPRESSIF_ESP_WIFI_UTILS_H */

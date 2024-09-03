@@ -1,5 +1,5 @@
 /****************************************************************************
- * arch/xtensa/src/esp32s2/esp32s2_wifi_utils.c
+ * arch/xtensa/src/common/espressif/esp_wifi_utils.c
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -32,8 +32,11 @@
 #include <nuttx/kmalloc.h>
 #include <nuttx/wireless/wireless.h>
 
+#ifdef CONFIG_ARCH_CHIP_ESP32S2
 #include "esp32s2_wifi_adapter.h"
-#include "esp32s2_wifi_utils.h"
+#endif
+
+#include "esp_wifi_utils.h"
 #include "esp32s2_wireless.h"
 
 #include "esp_log.h"

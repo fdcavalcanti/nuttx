@@ -48,7 +48,7 @@
 #endif
 
 #include "esp32s2_wlan.h"
-#include "esp32s2_wifi_utils.h"
+#include "espressif/esp_wifi_utils.h"
 #include "esp32s2_wifi_adapter.h"
 #include "esp32s2_wireless.h"
 #include "esp32s2_systemreset.h"

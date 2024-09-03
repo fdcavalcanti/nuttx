@@ -40,4 +40,10 @@ ifeq ($(CONFIG_ESPRESSIF_TEMP),y)
 CHIP_CSRCS += esp_temperature_sensor.c
 endif
 
+ifeq ($(CONFIG_ESP32S2_WIRELESS),y)
+	ifeq ($(CONFIG_ESP32S2_WIFI),y)
+		CHIP_CSRCS += esp_wifi_utils.c
+	endif
+endif
+
 INCLUDES += ${INCDIR_PREFIX}$(ARCH_SRCDIR)$(DELIM)common$(DELIM)espressif$(DELIM)platform_include
