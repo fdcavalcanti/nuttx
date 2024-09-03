@@ -143,6 +143,10 @@ ifeq ($(CONFIG_RTC_DRIVER),y)
 CHIP_CSRCS += esp32s2_rtc_lowerhalf.c
 endif
 
+ifeq ($(CONFIG_ESPRESSIF_WIFI),y)
+CHIP_CSRCS += esp32s2_wifi_adapter.c
+endif
+
 #############################################################################
 # Espressif HAL for 3rd Party Platforms
 #############################################################################
@@ -151,7 +155,7 @@ endif
 
 ESP_HAL_3RDPARTY_REPO   = esp-hal-3rdparty
 ifndef ESP_HAL_3RDPARTY_VERSION
-	ESP_HAL_3RDPARTY_VERSION = 51770f0c97201401b535d833a30c5c0cb7df4edd
+	ESP_HAL_3RDPARTY_VERSION = 7857ae934736b2de2a387d90bd491fde2b3a5377
 endif
 
 ifndef ESP_HAL_3RDPARTY_URL
@@ -187,10 +191,6 @@ ifeq ($(CONFIG_ESPRESSIF_WIRELESS),y)
 	$(Q) git -C chip/$(ESP_HAL_3RDPARTY_REPO)/components/mbedtls/mbedtls reset --quiet --hard
 	$(Q) echo "Applying patches..."
 	$(Q) cd chip/$(ESP_HAL_3RDPARTY_REPO)/components/mbedtls/mbedtls && git apply ../../../nuttx/patches/components/mbedtls/mbedtls/*.patch
-endif
-
-ifeq ($(CONFIG_ESPRESSIF_WIRELESS),y)
-include chip/Wireless.mk
 endif
 
 distclean::
