@@ -1,5 +1,5 @@
 /****************************************************************************
- * arch/xtensa/src/esp32s2/esp32s2_wireless.h
+ * arch/xtensa/src/common/espressif/esp_wireless.h
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -18,8 +18,8 @@
  *
  ****************************************************************************/
 
-#ifndef __ARCH_XTENSA_SRC_ESP32S2_ESP32S2_WIRELESS_H
-#define __ARCH_XTENSA_SRC_ESP32S2_ESP32S2_WIRELESS_H
+#ifndef __ARCH_XTENSA_SRC_COMMON_ESPRESSIF_ESP_WIRELESS_H
+#define __ARCH_XTENSA_SRC_COMMON_ESPRESSIF_ESP_WIRELESS_H
 
 /****************************************************************************
  * Included Files
@@ -31,8 +31,16 @@
 #include <nuttx/config.h>
 #include <nuttx/list.h>
 
+#ifdef CONFIG_ARCH_CHIP_ESP32
+#include "xtensa_attr.h"
+#include "esp32_rt_timer.h"
+#elif CONFIG_ARCH_CHIP_ESP32S2
 #include "esp_attr.h"
 #include "esp32s2_rt_timer.h"
+#elif CONFIG_ARCH_CHIP_ESP32S3
+#include "esp_attr.h"
+#include "esp32s3_rt_timer.h"
+#endif
 
 #include "esp_log.h"
 #include "esp_mac.h"
@@ -50,6 +58,14 @@
 /* Note: Don't remove these definitions, they are needed by the 3rdparty IDF
  * headers
  */
+
+#ifdef CONFIG_ARCH_CHIP_ESP32
+#ifdef CONFIG_ESP32_SUPPORT_MULTIPLE_PHY_INIT_DATA
+#  undef CONFIG_ESP32_SUPPORT_MULTIPLE_PHY_INIT_DATA_BIN
+#  define CONFIG_ESP32_SUPPORT_MULTIPLE_PHY_INIT_DATA_BIN 1
+#endif
+#  define SOC_COEX_HW_PTI                               0
+#endif
 
 #define CONFIG_MAC_BB_PD                              (0)
 #define MAC_LEN                                       (6)
@@ -80,8 +96,51 @@ struct esp_queuecache_s
 };
 
 /****************************************************************************
+ * Inline Functions
+ ****************************************************************************/
+
+/****************************************************************************
+ * Name: nuttx_err_to_freertos
+ *
+ * Description:
+ *   Transform from Nuttx OS error code to FreeRTOS's pdTRUE or pdFALSE.
+ *
+ * Input Parameters:
+ *   ret - NuttX error code
+ *
+ * Returned Value:
+ *   Wi-Fi adapter error code
+ *
+ ****************************************************************************/
+
+#ifndef CONFIG_ARCH_CHIP_ESP32S2
+static inline int32_t nuttx_err_to_freertos(int ret)
+{
+  return ret >= 0;
+}
+#endif
+
+/****************************************************************************
  * Public Function Prototypes
  ****************************************************************************/
+
+/****************************************************************************
+ * Name: esp_wifi_to_errno
+ *
+ * Description:
+ *   Transform from ESP Wi-Fi error code to NuttX error code
+ *
+ * Input Parameters:
+ *   err - ESP Wi-Fi error code
+ *
+ * Returned Value:
+ *   NuttX error code defined in errno.h
+ *
+ ****************************************************************************/
+
+#ifndef CONFIG_ARCH_CHIP_ESP32S2
+int32_t esp_wifi_to_errno(int err);
+#endif
 
 /****************************************************************************
  * Functions needed by libphy.a
@@ -328,4 +387,4 @@ int esp_wireless_init(void);
 
 int esp_wireless_deinit(void);
 
-#endif /* __ARCH_XTENSA_SRC_ESP32S2_ESP32S2_WIRELESS_H */
+#endif /* __ARCH_XTENSA_SRC_COMMON_ESPRESSIF_ESP_WIRELESS_H */

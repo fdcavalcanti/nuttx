@@ -60,7 +60,7 @@
 #include "hardware/esp32s2_syscon.h"
 #include "hardware/esp32s2_soc.h"
 #include "esp32s2_irq.h"
-#include "esp32s2_wireless.h"
+#include "espressif/esp_wireless.h"
 #include "esp32s2_wifi_adapter.h"
 #include "esp32s2_rt_timer.h"
 #include "espressif/esp_wifi_utils.h"

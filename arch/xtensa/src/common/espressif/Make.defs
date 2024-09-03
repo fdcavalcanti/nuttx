@@ -41,6 +41,7 @@ CHIP_CSRCS += esp_temperature_sensor.c
 endif
 
 ifeq ($(CONFIG_ESP32S2_WIRELESS),y)
+      CHIP_CSRCS += esp_wireless.c
 	ifeq ($(CONFIG_ESP32S2_WIFI),y)
 		CHIP_CSRCS += esp_wifi_utils.c
 	endif

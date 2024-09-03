@@ -29,7 +29,7 @@ EXTRA_LIBS += -lphy
 
 # Wireless interfaces.
 
-CHIP_CSRCS += esp32s2_wireless.c
+# CHIP_CSRCS += esp32s2_wireless.c
 
 ifeq ($(CONFIG_ESP32S2_WIFI),y)
 # CHIP_CSRCS += esp32s2_wlan.c esp32s2_wifi_utils.c esp32s2_wifi_adapter.c

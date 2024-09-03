@@ -1,5 +1,5 @@
 /****************************************************************************
- * arch/xtensa/src/esp32s2/esp32s2_wireless.c
+ * arch/xtensa/src/common/espressif/esp_wireless.c
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -32,6 +32,7 @@
 #include <sys/param.h>
 
 #include "xtensa.h"
+#ifdef CONFIG_ARCH_CHIP_ESP32S2
 #include "hardware/esp32s2_efuse.h"
 #include "hardware/esp32s2_rtccntl.h"
 #include "hardware/esp32s2_soc.h"
@@ -39,6 +40,7 @@
 #include "hardware/esp32s2_system.h"
 #include "esp32s2_irq.h"
 /* #include "esp32s2_partition.h" */
+#endif
 
 #include "esp_private/phy.h"
 #ifdef CONFIG_ESP32S2_WIFI
@@ -49,7 +51,7 @@
 #include "esp_phy_init.h"
 #include "phy_init_data.h"
 
-#include "esp32s2_wireless.h"
+#include "esp_wireless.h"
 
 /****************************************************************************
  * Pre-processor Definitions

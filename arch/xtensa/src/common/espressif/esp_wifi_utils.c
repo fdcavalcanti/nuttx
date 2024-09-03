@@ -37,7 +37,7 @@
 #endif
 
 #include "esp_wifi_utils.h"
-#include "esp32s2_wireless.h"
+#include "esp_wireless.h"
 
 #include "esp_log.h"
 #include "esp_mac.h"

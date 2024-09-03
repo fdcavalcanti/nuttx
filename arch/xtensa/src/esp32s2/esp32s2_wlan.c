@@ -50,7 +50,7 @@
 #include "esp32s2_wlan.h"
 #include "espressif/esp_wifi_utils.h"
 #include "esp32s2_wifi_adapter.h"
-#include "esp32s2_wireless.h"
+#include "espressif/esp_wireless.h"
 #include "esp32s2_systemreset.h"
 
 /****************************************************************************
