@@ -82,11 +82,15 @@
 #  define SWI_PERIPH          ESP32_PERIPH_CPU_CPU2
 #  define esp_partition_read  esp32_partition_read
 #  define esp_partition_write esp32_partition_write
+#  define esp_setup_irq       esp32_setup_irq
+#  define esp_teardown_irq    esp32_teardown_irq
 #elif CONFIG_ARCH_CHIP_ESP32S2
 #  define SWI_IRQ             ESP32S2_IRQ_INT_FROM_CPU2
 #  define SWI_PERIPH          ESP32S2_PERIPH_INT_FROM_CPU2
 #  define esp_partition_read  esp32s2_partition_read
 #  define esp_partition_write esp32s2_partition_write
+#  define esp_setup_irq       esp32s2_setup_irq
+#  define esp_teardown_irq    esp32s2_teardown_irq
 #elif CONFIG_ARCH_CHIP_ESP32S3
 #  define SWI_IRQ             ESP32S3_IRQ_INT_FROM_CPU2
 #  define SWI_PERIPH          ESP32S3_PERIPH_INT_FROM_CPU2
@@ -96,6 +100,8 @@
 #  define rt_timer_start      esp32s3_rt_timer_start
 #  define rt_timer_stop       esp32s3_rt_timer_stop
 #  define rt_timer_delete     esp32s3_rt_timer_delete
+#  define esp_setup_irq       esp32s3_setup_irq
+#  define esp_teardown_irq    esp32s3_teardown_irq
 #endif
 
 /****************************************************************************
@@ -1383,7 +1389,13 @@ int esp_wireless_init(void)
       return OK;
     }
 
-  priv->cpuint = esp32s2_setup_irq(SWI_PERIPH, ESP32S2_INT_PRIO_DEF, 0);
+#ifdef CONFIG_ARCH_CHIP_ESP32
+  priv->cpuint = esp_setup_irq(0, SWI_PERIPH, 1, ESP32_CPUINT_LEVEL);
+#elif CONFIG_ARCH_CHIP_ESP32S2
+  priv->cpuint = esp_setup_irq(SWI_PERIPH, ESP32S2_INT_PRIO_DEF, 0);
+#elif CONFIG_ARCH_CHIP_ESP32S3
+  priv->cpuint = esp_setup_irq(0, SWI_PERIPH, ESP32S3_INT_PRIO_DEF, 0);
+#endif
   if (priv->cpuint < 0)
     {
       /* Failed to allocate a CPU interrupt of this type. */
@@ -1398,7 +1410,13 @@ int esp_wireless_init(void)
   ret = irq_attach(SWI_IRQ, esp_swi_irq, NULL);
   if (ret < 0)
     {
-      esp32s2_teardown_irq(SWI_PERIPH, priv->cpuint);
+#ifdef CONFIG_ARCH_CHIP_ESP32
+      esp_teardown_irq(0, SWI_PERIPH, priv->cpuint);
+#elif CONFIG_ARCH_CHIP_ESP32S2
+      esp_teardown_irq(SWI_PERIPH, priv->cpuint);
+#elif CONFIG_ARCH_CHIP_ESP32S3
+      esp_teardown_irq(0, SWI_PERIPH, priv->cpuint);
+#endif
       leave_critical_section(flags);
       wlerr("ERROR: Failed to attach IRQ ret=%d\n", ret);
 
@@ -1448,7 +1466,13 @@ int esp_wireless_deinit(void)
         {
           up_disable_irq(SWI_IRQ);
           irq_detach(SWI_IRQ);
-          esp32s2_teardown_irq(SWI_PERIPH, priv->cpuint);
+#ifdef CONFIG_ARCH_CHIP_ESP32
+          esp_teardown_irq(0, SWI_PERIPH, priv->cpuint);
+#elif CONFIG_ARCH_CHIP_ESP32S2
+          esp_teardown_irq(SWI_PERIPH, priv->cpuint);
+#elif CONFIG_ARCH_CHIP_ESP32S3
+          esp_teardown_irq(0, SWI_PERIPH, priv->cpuint);
+#endif
         }
     }
 

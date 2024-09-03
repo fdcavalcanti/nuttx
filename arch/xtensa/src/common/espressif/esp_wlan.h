@@ -92,7 +92,7 @@ int esp_wlan_sta_initialize(void);
 #endif /* ESPRESSIF_WLAN_HAS_STA */
 
 /****************************************************************************
- * Name: esp32s2_wlan_softap_initialize
+ * Name: esp_wlan_softap_initialize
  *
  * Description:
  *   Initialize the ESP32|S2|S3 WLAN softAP netcard driver
