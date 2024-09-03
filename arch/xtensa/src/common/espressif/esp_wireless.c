@@ -171,11 +171,11 @@ static bool g_is_phy_calibrated = false;
 
 static struct esp_wireless_priv_s g_esp_wireless_priv;
 
-#ifdef CONFIG_ESP32S2_PHY_INIT_DATA_IN_PARTITION
+#ifdef CONFIG_ESPRESSIF_PHY_INIT_DATA_IN_PARTITION
 static const char *phy_partion_label = "phy_init";
 #endif
 
-#ifdef CONFIG_ESP32S2_SUPPORT_MULTIPLE_PHY_INIT_DATA
+#ifdef CONFIG_ESPRESSIF_SUPPORT_MULTIPLE_PHY_INIT_DATA
 
 static phy_init_data_type_t g_phy_init_data_type;
 
@@ -532,7 +532,7 @@ int phy_printf(const char *format, ...)
   return 0;
 }
 
-#ifdef CONFIG_ESP32S2_SUPPORT_MULTIPLE_PHY_INIT_DATA
+#ifdef CONFIG_ESPRESSIF_SUPPORT_MULTIPLE_PHY_INIT_DATA
 
 /****************************************************************************
  * Name: phy_crc_check
@@ -823,7 +823,7 @@ static int phy_update_init_data(phy_init_data_type_t init_data_type)
       if (ret != OK)
         {
           kmm_free(init_data_store);
-#ifdef CONFIG_ESP32S2_PHY_INIT_DATA_ERROR
+#ifdef CONFIG_ESPRESSIF_PHY_INIT_DATA_ERROR
           abort();
 #else
           return ret;
@@ -858,7 +858,7 @@ static int phy_update_init_data(phy_init_data_type_t init_data_type)
 
 #endif
 
-#ifdef CONFIG_ESP32S2_PHY_INIT_DATA_IN_PARTITION
+#ifdef CONFIG_ESPRESSIF_PHY_INIT_DATA_IN_PARTITION
 
 /****************************************************************************
  * Name: esp_phy_get_init_data
@@ -899,7 +899,7 @@ const esp_phy_init_data_t *esp_phy_get_init_data(void)
       != 0 || memcmp(init_data_store + length - sizeof(phy_init_magic_post),
               PHY_INIT_MAGIC, sizeof(phy_init_magic_post)) != 0)
     {
-#ifdef CONFIG_ESP32S2_PHY_DEFAULT_INIT_IF_INVALID
+#ifdef CONFIG_ESPRESSIF_PHY_DEFAULT_INIT_IF_INVALID
       wlerr("ERROR: Failed to validate PHY data partition, restoring "
             "default data into flash...");
       memcpy(init_data_store, PHY_INIT_MAGIC, sizeof(phy_init_magic_pre));
@@ -924,14 +924,14 @@ const esp_phy_init_data_t *esp_phy_get_init_data(void)
           kmm_free(init_data_store);
           return NULL;
         }
-#else /* CONFIG_ESP32S2_PHY_DEFAULT_INIT_IF_INVALID */
+#else /* CONFIG_ESPRESSIF_PHY_DEFAULT_INIT_IF_INVALID */
       wlerr("ERROR: Failed to validate PHY data partition\n");
       kmm_free(init_data_store);
       return NULL;
 #endif
     }
 
-#ifdef CONFIG_ESP32S2_SUPPORT_MULTIPLE_PHY_INIT_DATA
+#ifdef CONFIG_ESPRESSIF_SUPPORT_MULTIPLE_PHY_INIT_DATA
   if (*(init_data_store + (sizeof(phy_init_magic_pre) +
       PHY_SUPPORT_MULTIPLE_BIN_OFFSET)))
     {
@@ -968,7 +968,7 @@ void esp_phy_release_init_data(const esp_phy_init_data_t *init_data)
   kmm_free((uint8_t *)init_data - sizeof(phy_init_magic_pre));
 }
 
-#else /* CONFIG_ESP32S2_PHY_INIT_DATA_IN_PARTITION */
+#else /* CONFIG_ESPRESSIF_PHY_INIT_DATA_IN_PARTITION */
 
 /****************************************************************************
  * Name: esp_phy_get_init_data
@@ -1025,7 +1025,7 @@ void esp_phy_release_init_data(const esp_phy_init_data_t *init_data)
 
 int esp_phy_update_country_info(const char *country)
 {
-#ifdef CONFIG_ESP32S2_SUPPORT_MULTIPLE_PHY_INIT_DATA
+#ifdef CONFIG_ESPRESSIF_SUPPORT_MULTIPLE_PHY_INIT_DATA
   uint8_t phy_init_data_type_map = 0;
   if (memcmp(country, g_phy_current_country, sizeof(g_phy_current_country))
       == 0)
