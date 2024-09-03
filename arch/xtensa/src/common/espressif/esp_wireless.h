@@ -263,7 +263,7 @@ int32_t esp_timer_stop(esp_timer_handle_t timer);
 int32_t esp_timer_delete(esp_timer_handle_t timer);
 
 /****************************************************************************
- * Name: esp32s2_phy_update_country_info
+ * Name: esp_phy_update_country_info
  *
  * Description:
  *   Update PHY init data according to country code
@@ -276,7 +276,7 @@ int32_t esp_timer_delete(esp_timer_handle_t timer);
  *
  ****************************************************************************/
 
-int esp32s2_phy_update_country_info(const char *country);
+int esp_phy_update_country_info(const char *country);
 
 /****************************************************************************
  * Name: esp_init_semcache
@@ -321,6 +321,7 @@ void esp_post_semcache(struct esp_semcache_s *sc);
  *   qc     - Queue cache data pointer
  *   mq_ptr - Queue data pointer
  *   buffer - Queue cache buffer pointer
+ *   len    - Queue cache max length
  *   size   - Queue cache buffer size
  *
  * Returned Value:
@@ -328,13 +329,21 @@ void esp_post_semcache(struct esp_semcache_s *sc);
  *
  ****************************************************************************/
 
+#ifdef CONFIG_ARCH_CHIP_ESP32
+void esp_init_queuecache(struct esp_queuecache_s *qc,
+                         struct file *mq_ptr,
+                         uint8_t *buffer,
+                         size_t len,
+                         size_t size);
+#else
 void esp_init_queuecache(struct esp_queuecache_s *qc,
                          struct file *mq_ptr,
                          uint8_t *buffer,
                          size_t size);
+#endif
 
 /****************************************************************************
- * Name: esp32_wl_send_queuecache
+ * Name: esp_send_queuecache
  *
  * Description:
  *   Store posting queue action and data into queue cache.
@@ -349,9 +358,13 @@ void esp_init_queuecache(struct esp_queuecache_s *qc,
  *
  ****************************************************************************/
 
+#ifdef CONFIG_ARCH_CHIP_ESP32
+void esp_send_queuecache(void *qc, uint8_t *buffer, int size);
+#else
 void esp_send_queuecache(struct esp_queuecache_s *qc,
                          uint8_t *buffer,
                          int size);
+#endif
 
 /****************************************************************************
  * Name: esp_wireless_init

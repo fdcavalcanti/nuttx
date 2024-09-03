@@ -64,7 +64,7 @@
 #include "esp32s2_wifi_adapter.h"
 #include "esp32s2_rt_timer.h"
 #include "espressif/esp_wifi_utils.h"
-#include "esp32s2_wlan.h"
+#include "espressif/esp_wlan.h"
 
 #include "esp_log.h"
 #include "esp_mac.h"
@@ -453,7 +453,7 @@ wifi_osi_funcs_t g_wifi_osi_funcs =
   ._phy_enable = esp_phy_enable_wrapper,
   ._phy_common_clock_enable = esp_phy_common_clock_enable,
   ._phy_common_clock_disable = esp_phy_common_clock_disable,
-  ._phy_update_country_info = esp32s2_phy_update_country_info,
+  ._phy_update_country_info = esp_phy_update_country_info,
   ._read_mac = esp_wifi_read_mac,
   ._timer_arm = esp_timer_arm,
   ._timer_disarm = esp_timer_disarm,
@@ -2121,7 +2121,7 @@ static void esp_evt_work_cb(void *arg)
           case WIFI_ADPT_EVT_STA_CONNECT:
             wlinfo("Wi-Fi sta connect\n");
             g_sta_connected = true;
-            ret = esp32s2_wlan_sta_set_linkstatus(true);
+            ret = esp_wlan_sta_set_linkstatus(true);
             if (ret < 0)
               {
                 wlerr("ERROR: Failed to set Wi-Fi station link status\n");
@@ -2132,7 +2132,7 @@ static void esp_evt_work_cb(void *arg)
           case WIFI_ADPT_EVT_STA_DISCONNECT:
             wlinfo("Wi-Fi sta disconnect\n");
             g_sta_connected = false;
-            ret = esp32s2_wlan_sta_set_linkstatus(false);
+            ret = esp_wlan_sta_set_linkstatus(false);
             if (ret < 0)
               {
                 wlerr("ERROR: Failed to set Wi-Fi station link status\n");

@@ -32,7 +32,13 @@
 #include <sys/param.h>
 
 #include "xtensa.h"
-#ifdef CONFIG_ARCH_CHIP_ESP32S2
+#ifdef CONFIG_ARCH_CHIP_ESP32
+#include "hardware/esp32_dport.h"
+#include "hardware/esp32_emac.h"
+#include "hardware/esp32_soc.h"
+#include "esp32_irq.h"
+#include "esp32_partition.h"
+#elif CONFIG_ARCH_CHIP_ESP32S2
 #include "hardware/esp32s2_efuse.h"
 #include "hardware/esp32s2_rtccntl.h"
 #include "hardware/esp32s2_soc.h"
@@ -40,12 +46,24 @@
 #include "hardware/esp32s2_system.h"
 #include "esp32s2_irq.h"
 /* #include "esp32s2_partition.h" */
+#elif CONFIG_ARCH_CHIP_ESP32S3
+#include "hardware/esp32s3_efuse.h"
+#include "hardware/esp32s3_rtccntl.h"
+#include "hardware/esp32s3_soc.h"
+#include "hardware/esp32s3_syscon.h"
+#include "hardware/esp32s3_system.h"
+#include "esp32s3_irq.h"
+#include "esp32s3_partition.h"
 #endif
 
 #include "esp_private/phy.h"
 #ifdef CONFIG_ESP32S2_WIFI
 #  include "esp_private/wifi.h"
 #  include "esp_wpa.h"
+#endif
+
+#ifndef CONFIG_ARCH_CHIP_ESP32S2
+#include "private/esp_coexist_internal.h"
 #endif
 #include "periph_ctrl.h"
 #include "esp_phy_init.h"
@@ -59,8 +77,26 @@
 
 /* Software Interrupt */
 
-#define SWI_IRQ       ESP32S2_IRQ_INT_FROM_CPU2
-#define SWI_PERIPH    ESP32S2_PERIPH_INT_FROM_CPU2
+#ifdef CONFIG_ARCH_CHIP_ESP32
+#  define SWI_IRQ             ESP32_IRQ_CPU_CPU2
+#  define SWI_PERIPH          ESP32_PERIPH_CPU_CPU2
+#  define esp_partition_read  esp32_partition_read
+#  define esp_partition_write esp32_partition_write
+#elif CONFIG_ARCH_CHIP_ESP32S2
+#  define SWI_IRQ             ESP32S2_IRQ_INT_FROM_CPU2
+#  define SWI_PERIPH          ESP32S2_PERIPH_INT_FROM_CPU2
+#  define esp_partition_read  esp32s2_partition_read
+#  define esp_partition_write esp32s2_partition_write
+#elif CONFIG_ARCH_CHIP_ESP32S3
+#  define SWI_IRQ             ESP32S3_IRQ_INT_FROM_CPU2
+#  define SWI_PERIPH          ESP32S3_PERIPH_INT_FROM_CPU2
+#  define esp_partition_read  esp32s3_partition_read
+#  define esp_partition_write esp32s3_partition_write
+#  define rt_timer_create     esp32s3_rt_timer_create
+#  define rt_timer_start      esp32s3_rt_timer_start
+#  define rt_timer_stop       esp32s3_rt_timer_stop
+#  define rt_timer_delete     esp32s3_rt_timer_delete
+#endif
 
 /****************************************************************************
  * Private Types
@@ -76,6 +112,9 @@ struct esp_wireless_priv_s
 
   struct list_node sc_list;       /* Semaphore cache list */
   struct list_node qc_list;       /* Queue cache list */
+#ifdef CONFIG_ARCH_CHIP_ESP32
+  struct list_node qc_freelist;   /* List of free queue cache structures */
+#endif
 };
 
 /****************************************************************************
@@ -85,6 +124,9 @@ struct esp_wireless_priv_s
 static inline void phy_digital_regs_store(void);
 static inline void phy_digital_regs_load(void);
 static int esp_swi_irq(int irq, void *context, void *arg);
+#ifdef CONFIG_ESP32_WIFI
+static void esp_wifi_set_log_level(void);
+#endif
 
 /****************************************************************************
  * Extern Functions declaration
@@ -200,6 +242,12 @@ static phy_country_to_bin_type_t g_country_code_map_type_table[] =
 
 #endif
 
+/* Callback function to update WiFi MAC time */
+
+#ifdef CONFIG_ARCH_CHIP_ESP32
+wifi_mac_time_update_cb_t g_wifi_mac_time_update_cb = NULL;
+#endif
+
 /****************************************************************************
  * Private Functions
  ****************************************************************************/
@@ -268,7 +316,11 @@ static int esp_swi_irq(int irq, void *context, void *arg)
   struct esp_queuecache_s *qc_tmp;
   struct esp_wireless_priv_s *priv = &g_esp_wireless_priv;
 
+#ifdef CONFIG_ARCH_CHIP_ESP32
+  modifyreg32(DPORT_CPU_INTR_FROM_CPU_2_REG, DPORT_CPU_INTR_FROM_CPU_2, 0);
+#else
   modifyreg32(SYSTEM_CPU_INTR_FROM_CPU_2_REG, SYSTEM_CPU_INTR_FROM_CPU_2, 0);
+#endif
 
   list_for_every_entry_safe(&priv->sc_list, sc, sc_tmp,
                             struct esp_semcache_s, node)
@@ -296,6 +348,9 @@ static int esp_swi_irq(int irq, void *context, void *arg)
         }
 
       list_delete(&qc->node);
+#ifdef CONFIG_ARCH_CHIP_ESP32
+      list_add_tail(&priv->qc_freelist, &qc->node);
+#endif
     }
 
   return OK;
@@ -339,6 +394,87 @@ static void esp_wifi_set_log_level(void)
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
+
+/****************************************************************************
+ * Name: esp_wifi_to_errno
+ *
+ * Description:
+ *   Transform from ESP Wi-Fi error code to NuttX error code
+ *
+ * Input Parameters:
+ *   err - ESP Wi-Fi error code
+ *
+ * Returned Value:
+ *   NuttX error code defined in errno.h
+ *
+ ****************************************************************************/
+
+#ifndef CONFIG_ARCH_CHIP_ESP32S2
+int32_t esp_wifi_to_errno(int err)
+{
+  int ret;
+
+  if (err < ESP_ERR_WIFI_BASE)
+    {
+      /* Unmask component error bits */
+
+      ret = err & 0xfff;
+
+      switch (ret)
+        {
+          case ESP_OK:
+            ret = OK;
+            break;
+          case ESP_ERR_NO_MEM:
+            ret = -ENOMEM;
+            break;
+
+          case ESP_ERR_INVALID_ARG:
+            ret = -EINVAL;
+            break;
+
+          case ESP_ERR_INVALID_STATE:
+            ret = -EIO;
+            break;
+
+          case ESP_ERR_INVALID_SIZE:
+            ret = -EINVAL;
+            break;
+
+          case ESP_ERR_NOT_FOUND:
+            ret = -ENOSYS;
+            break;
+
+          case ESP_ERR_NOT_SUPPORTED:
+            ret = -ENOSYS;
+            break;
+
+          case ESP_ERR_TIMEOUT:
+            ret = -ETIMEDOUT;
+            break;
+
+          case ESP_ERR_INVALID_MAC:
+            ret = -EINVAL;
+            break;
+
+          default:
+            ret = ERROR;
+            break;
+        }
+    }
+  else
+    {
+      ret = ERROR;
+    }
+
+  if (ret != OK)
+    {
+      wlerr("ERROR: %s\n", esp_err_to_name(err));
+    }
+
+  return ret;
+}
+#endif
 
 /****************************************************************************
  * Functions needed by libphy.a
@@ -536,10 +672,10 @@ static int phy_get_multiple_init_data(uint8_t *data, size_t length,
       return -ENOMEM;
     }
 
-  int ret = esp32s2_partition_read(phy_partion_label,
-                                   length,
-                                   control_info,
-                                   sizeof(phy_control_info_data_t));
+  int ret = esp_partition_read(phy_partion_label,
+                               length,
+                               control_info,
+                               sizeof(phy_control_info_data_t));
   if (ret != OK)
     {
       kmm_free(control_info);
@@ -576,7 +712,7 @@ static int phy_get_multiple_init_data(uint8_t *data, size_t length,
       return -ENOMEM;
     }
 
-  ret = esp32s2_partition_read(phy_partion_label, length +
+  ret = esp_partition_read(phy_partion_label, length +
           sizeof(phy_control_info_data_t), init_data_multiple,
           sizeof(esp_phy_init_data_t) * control_info->number);
   if (ret != OK)
@@ -653,8 +789,8 @@ static int phy_update_init_data(phy_init_data_type_t init_data_type)
       return -ENOMEM;
     }
 
-  ret = esp32s2_partition_read(phy_partion_label, 0, init_data_store,
-                               length);
+  ret = esp_partition_read(phy_partion_label, 0, init_data_store,
+                           length);
   if (ret != OK)
     {
       kmm_free(init_data_store);
@@ -744,8 +880,8 @@ const esp_phy_init_data_t *esp_phy_get_init_data(void)
       return NULL;
     }
 
-  ret = esp32s2_partition_read(phy_partion_label, 0, init_data_store,
-                               length);
+  ret = esp_partition_read(phy_partion_label, 0, init_data_store,
+                           length);
   if (ret != OK)
     {
       wlerr("ERROR: Failed to get read data from MTD\n");
@@ -774,7 +910,7 @@ const esp_phy_init_data_t *esp_phy_get_init_data(void)
 
       /* write default data */
 
-      ret = esp32s2_partition_write(phy_partion_label, 0, init_data_store,
+      ret = esp_partition_write(phy_partion_label, 0, init_data_store,
                                     length);
       if (ret != OK)
         {
@@ -868,7 +1004,7 @@ void esp_phy_release_init_data(const esp_phy_init_data_t *init_data)
 #endif
 
 /****************************************************************************
- * Name: esp32s2_phy_update_country_info
+ * Name: esp_phy_update_country_info
  *
  * Description:
  *   Update PHY init data according to country code
@@ -881,7 +1017,7 @@ void esp_phy_release_init_data(const esp_phy_init_data_t *init_data)
  *
  ****************************************************************************/
 
-int esp32s2_phy_update_country_info(const char *country)
+int esp_phy_update_country_info(const char *country)
 {
 #ifdef CONFIG_ESP32S2_SUPPORT_MULTIPLE_PHY_INIT_DATA
   uint8_t phy_init_data_type_map = 0;
@@ -1097,7 +1233,11 @@ IRAM_ATTR void esp_post_semcache(struct esp_semcache_s *sc)
    * are (re)enabled.
    */
 
+#ifdef CONFIG_ARCH_CHIP_ESP32
+  modifyreg32(DPORT_CPU_INTR_FROM_CPU_2_REG, 0, DPORT_CPU_INTR_FROM_CPU_2);
+#else
   modifyreg32(SYSTEM_CPU_INTR_FROM_CPU_2_REG, 0, SYSTEM_CPU_INTR_FROM_CPU_2);
+#endif
 }
 
 /****************************************************************************
@@ -1110,6 +1250,7 @@ IRAM_ATTR void esp_post_semcache(struct esp_semcache_s *sc)
  *   qc     - Queue cache data pointer
  *   mq_ptr - Queue data pointer
  *   buffer - Queue cache buffer pointer
+ *   len    - Queue cache max length (ESP32 only)
  *   size   - Queue cache buffer size
  *
  * Returned Value:
@@ -1117,6 +1258,27 @@ IRAM_ATTR void esp_post_semcache(struct esp_semcache_s *sc)
  *
  ****************************************************************************/
 
+#ifdef CONFIG_ARCH_CHIP_ESP32
+void esp_init_queuecache(struct esp_queuecache_s *qc,
+                         struct file *mq_ptr,
+                         uint8_t *buffer,
+                         size_t len,
+                         size_t size)
+{
+  struct esp_wireless_priv_s *priv = &g_esp_wireless_priv;
+  int i;
+
+  for (i = 0; i < len; i++)
+    {
+      qc[i].mq_ptr = mq_ptr;
+      qc[i].size   = size;
+      qc[i].buffer = buffer;
+      list_initialize(&qc[i].node);
+
+      list_add_tail(&priv->qc_freelist, &qc[i].node);
+    }
+}
+#else
 void esp_init_queuecache(struct esp_queuecache_s *qc,
                          struct file *mq_ptr,
                          uint8_t *buffer,
@@ -1127,6 +1289,7 @@ void esp_init_queuecache(struct esp_queuecache_s *qc,
   qc->buffer = buffer;
   list_initialize(&qc->node);
 }
+#endif
 
 /****************************************************************************
  * Name: esp_send_queuecache
@@ -1144,6 +1307,34 @@ void esp_init_queuecache(struct esp_queuecache_s *qc,
  *
  ****************************************************************************/
 
+#ifdef CONFIG_ARCH_CHIP_ESP32
+IRAM_ATTR void esp_send_queuecache(void *queue, uint8_t *buffer, int size)
+{
+  struct esp_wireless_priv_s *priv = &g_esp_wireless_priv;
+  struct esp_queuecache_s *msg;
+  irqstate_t flags;
+
+  flags = enter_critical_section();
+
+  msg = (struct esp_queuecache_s *)list_remove_head(&priv->qc_freelist);
+  DEBUGASSERT(msg != NULL);
+
+  DEBUGASSERT(msg->size == size);
+  DEBUGASSERT(msg->mq_ptr == queue);
+
+  memcpy(msg->buffer, buffer, size);
+
+  list_add_tail(&priv->qc_list, &msg->node);
+
+  leave_critical_section(flags);
+
+  /* Enable CPU 2 interrupt. This will generate an IRQ as soon as non-IRAM
+   * are (re)enabled.
+   */
+
+  modifyreg32(DPORT_CPU_INTR_FROM_CPU_2_REG, 0, DPORT_CPU_INTR_FROM_CPU_2);
+}
+#else
 IRAM_ATTR void esp_send_queuecache(struct esp_queuecache_s *qc,
                                    uint8_t *buffer,
                                    int size)
@@ -1161,6 +1352,7 @@ IRAM_ATTR void esp_send_queuecache(struct esp_queuecache_s *qc,
 
   modifyreg32(SYSTEM_CPU_INTR_FROM_CPU_2_REG, 0, SYSTEM_CPU_INTR_FROM_CPU_2);
 }
+#endif
 
 /****************************************************************************
  * Name: esp_wireless_init
@@ -1215,7 +1407,9 @@ int esp_wireless_init(void)
 
   list_initialize(&priv->sc_list);
   list_initialize(&priv->qc_list);
-
+#ifdef CONFIG_ARCH_CHIP_ESP32
+  list_initialize(&priv->qc_freelist);
+#endif
   up_enable_irq(SWI_IRQ);
 
   priv->ref++;
@@ -1283,6 +1477,31 @@ int32_t esp_wifi_init(const wifi_init_config_t *config)
 {
   int32_t ret;
 
+#ifdef CONFIG_ARCH_CHIP_ESP32S3
+  uint32_t min_active_time_us =
+              CONFIG_ESP_WIFI_SLP_DEFAULT_MIN_ACTIVE_TIME * 1000;
+  uint32_t keep_alive_time_us =
+              CONFIG_ESP_WIFI_SLP_DEFAULT_MAX_ACTIVE_TIME * 1000 * 1000;
+  uint32_t wait_broadcast_data_time_us =
+              CONFIG_ESP_WIFI_SLP_DEFAULT_WAIT_BROADCAST_DATA_TIME * 1000;
+
+  esp_wifi_set_sleep_min_active_time(min_active_time_us);
+  esp_wifi_set_keep_alive_time(keep_alive_time_us);
+  esp_wifi_set_sleep_wait_broadcast_data_time(wait_broadcast_data_time_us);
+#endif
+
+#if defined(CONFIG_ESP32S3_WIFI_BT_COEXIST) || \
+    defined(CONFIG_ESP32_WIFI_BT_COEXIST)
+  ret = coex_init();
+  if (ret)
+    {
+      wlerr("ERROR: Failed to initialize coex error=%d\n", ret);
+      return ret;
+    }
+#endif
+
+  /* WARN: Verify if power domain should go on before or after BT coexist */
+
   esp_wifi_power_domain_on();
 
   esp_wifi_set_log_level();
@@ -1294,7 +1513,15 @@ int32_t esp_wifi_init(const wifi_init_config_t *config)
       return ret;
     }
 
+#if defined(CONFIG_MAC_BB_P) && defined(CONFIG_ARCH_CHIP_ESP32)
+  esp_mac_bb_pd_mem_init();
+  esp_wifi_internal_set_mac_sleep(true);
+#endif
   esp_phy_modem_init();
+
+#ifdef CONFIG_ARCH_CHIP_ESP32
+  g_wifi_mac_time_update_cb = esp_wifi_internal_update_mac_time;
+#endif
 
   ret = esp_supplicant_init();
   if (ret)

@@ -1,5 +1,5 @@
 /****************************************************************************
- * arch/xtensa/src/esp32s2/esp32s2_wlan.h
+ * arch/xtensa/src/common/espressif/esp_wlan.h
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -18,8 +18,8 @@
  *
  ****************************************************************************/
 
-#ifndef __ARCH_XTENSA_SRC_ESP32S2_ESP32S2_WLAN_H
-#define __ARCH_XTENSA_SRC_ESP32S2_ESP32S2_WLAN_H
+#ifndef __ARCH_XTENSA_SRC_COMMON_ESPRESSIF_ESP_WLAN_H
+#define __ARCH_XTENSA_SRC_COMMON_ESPRESSIF_ESP_WLAN_H
 
 /****************************************************************************
  * Included Files
@@ -27,7 +27,9 @@
 
 #include <nuttx/config.h>
 
-#include "esp32s2_wifi_adapter.h"
+#ifdef CONFIG_ARCH_CHIP_ESP32S2
+#  include "esp32s2_wifi_adapter.h"
+#endif
 
 #ifndef __ASSEMBLY__
 
@@ -49,7 +51,7 @@ extern "C"
 #ifdef ESP32S2_WLAN_HAS_STA
 
 /****************************************************************************
- * Name: esp32s2_wlan_sta_set_linkstatus
+ * Name: esp_wlan_sta_set_linkstatus
  *
  * Description:
  *   Set Wi-Fi station link status
@@ -64,13 +66,13 @@ extern "C"
  *
  ****************************************************************************/
 
-int esp32s2_wlan_sta_set_linkstatus(bool linkstatus);
+int esp_wlan_sta_set_linkstatus(bool linkstatus);
 
 /****************************************************************************
- * Name: esp32s2_wlan_sta_initialize
+ * Name: esp_wlan_sta_initialize
  *
  * Description:
- *   Initialize the ESP32-S2 WLAN station netcard driver
+ *   Initialize the ESP32|S2|S3 WLAN station netcard driver
  *
  * Input Parameters:
  *   None
@@ -80,14 +82,14 @@ int esp32s2_wlan_sta_set_linkstatus(bool linkstatus);
  *
  ****************************************************************************/
 
-int esp32s2_wlan_sta_initialize(void);
+int esp_wlan_sta_initialize(void);
 #endif /* ESP32S2_WLAN_HAS_STA */
 
 /****************************************************************************
  * Name: esp32s2_wlan_softap_initialize
  *
  * Description:
- *   Initialize the ESP32-S2 WLAN softAP netcard driver
+ *   Initialize the ESP32|S2|S3 WLAN softAP netcard driver
  *
  * Input Parameters:
  *   None
@@ -98,7 +100,7 @@ int esp32s2_wlan_sta_initialize(void);
  ****************************************************************************/
 
 #ifdef ESP32S2_WLAN_HAS_SOFTAP
-int esp32s2_wlan_softap_initialize(void);
+int esp_wlan_softap_initialize(void);
 #endif /* ESP32S2_WLAN_HAS_SOFTAP */
 
 #endif /* CONFIG_ESP32S2_WIFI */
@@ -108,4 +110,4 @@ int esp32s2_wlan_softap_initialize(void);
 #undef EXTERN
 
 #endif /* __ASSEMBLY__ */
-#endif /* __ARCH_XTENSA_SRC_ESP32S2_ESP32S2_WLAN_H */
+#endif /* __ARCH_XTENSA_SRC_COMMON_ESPRESSIF_ESP_WLAN_H */
