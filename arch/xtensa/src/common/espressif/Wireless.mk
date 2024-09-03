@@ -1,5 +1,5 @@
 ############################################################################
-# arch/xtensa/src/esp32s2/Wireless.mk
+# arch/xtensa/src/common/espressif/Wireless.mk
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
