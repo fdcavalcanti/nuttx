@@ -78,6 +78,11 @@
 
 #define NO_CPUINT                     ETS_INVALID_INUM
 
+/* Masks for interrupt type used on esp_setup_irq */
+
+#define ESP_CPUINT_IRAM_MASK       (1 << 1)
+#define ESP_CPUINT_TRIGGER_MASK    (1 << 0)
+
 /****************************************************************************
  * Private Types
  ****************************************************************************/
@@ -464,7 +469,7 @@ void esp_route_intr(int source, int cpuint, irq_priority_t priority,
  *
  ****************************************************************************/
 
-int esp_setup_irq(int source, irq_priority_t priority, irq_trigger_t type)
+int esp_setup_irq(int source, irq_priority_t priority, int type)
 {
   irqstate_t irqstate;
   int irq;
@@ -492,7 +497,17 @@ int esp_setup_irq(int source, irq_priority_t priority, irq_trigger_t type)
       PANIC();
     }
 
-  esp_route_intr(source, cpuint, priority, type);
+  esp_route_intr(source, cpuint, priority, (type & ESP_CPUINT_TRIGGER_MASK));
+
+  if ((type & ESP_CPUINT_IRAM_MASK) == ESP_IRQ_IRAM)
+    {
+      esp_irq_set_iram_isr(irq);
+      irqinfo("source %d marked IRAM (irq=%d)\n", source, irq);
+    }
+  else
+    {
+      esp_irq_unset_iram_isr(irq);
+    }
 
   leave_critical_section(irqstate);
 
@@ -730,4 +745,62 @@ void esp_set_irq(int irq, int cpuint)
 {
   CPUINT_ASSIGN(g_cpuint_map[cpuint], irq);
   g_irq_map[irq] = cpuint;
+}
+
+/****************************************************************************
+ * Name:  esp_irq_set_iram_isr
+ *
+ * Description:
+ *   Set the ISR associated to an IRQ as a IRAM-enabled ISR.
+ *
+ * Input Parameters:
+ *   irq - The associated IRQ to set
+ *
+ * Returned Value:
+ *   OK on success; A negated errno value on failure.
+ *
+ ****************************************************************************/
+
+int esp_irq_set_iram_isr(int irq)
+{
+  uint32_t cpu = esp_cpu_get_core_id();
+  int cpuint = g_irq_map[irq];
+
+  if (cpuint == IRQ_UNMAPPED)
+    {
+      return -EINVAL;
+    }
+
+  non_iram_int_mask[cpu] &= ~(1 << cpuint);
+
+  return OK;
+}
+
+/****************************************************************************
+ * Name:  esp_irq_unset_iram_isr
+ *
+ * Description:
+ *   Set the ISR associated to an IRQ as a non-IRAM ISR.
+ *
+ * Input Parameters:
+ *   irq - The associated IRQ to set
+ *
+ * Returned Value:
+ *   OK on success; A negated errno value on failure.
+ *
+ ****************************************************************************/
+
+int esp_irq_unset_iram_isr(int irq)
+{
+  uint32_t cpu = esp_cpu_get_core_id();
+  int cpuint = g_irq_map[irq];
+
+  if (cpuint == IRQ_UNMAPPED)
+    {
+      return -EINVAL;
+    }
+
+  non_iram_int_mask[cpu] |= (1 << cpuint);
+
+  return OK;
 }
