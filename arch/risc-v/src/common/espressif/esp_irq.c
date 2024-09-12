@@ -135,6 +135,14 @@ static uint32_t non_iram_int_mask[CONFIG_ESPRESSIF_NUM_CPUS];
 static uint32_t non_iram_int_disabled[CONFIG_ESPRESSIF_NUM_CPUS];
 static bool non_iram_int_disabled_flag[CONFIG_ESPRESSIF_NUM_CPUS];
 
+#ifdef CONFIG_ESPRESSIF_IRAM_ISR_DEBUG
+/* The g_iram_count keeps track of how many times such an IRQ ran when the
+ * non-IRAM interrupts were disabled.
+ */
+
+static uint64_t g_iram_count[NR_IRQS];
+#endif
+
 /****************************************************************************
  * Private Functions
  ****************************************************************************/
@@ -277,6 +285,33 @@ static void esp_cpuint_initialize(void)
 
   memset(g_cpuint_map, 0, sizeof(g_cpuint_map));
 }
+
+#ifdef CONFIG_ESPRESSIF_IRAM_ISR_DEBUG
+
+/****************************************************************************
+ * Name:  esp_iram_interrupt_record
+ *
+ * Description:
+ *   This function keeps track of the IRQs that ran when non-IRAM interrupts
+ *   are disabled and enables debugging of the IRAM-enabled interrupts.
+ *
+ * Input Parameters:
+ *   irq - The IRQ associated with a CPU interrupt
+ *
+ * Returned Value:
+ *   None.
+ *
+ ****************************************************************************/
+
+void esp_irq_iram_interrupt_record(int irq)
+{
+  irqstate_t flags = enter_critical_section();
+
+  g_iram_count[irq]++;
+
+  leave_critical_section(flags);
+}
+#endif
 
 /****************************************************************************
  * Public Functions
@@ -572,6 +607,7 @@ IRAM_ATTR void *riscv_dispatch_irq(uintreg_t mcause, uintreg_t *regs)
   int irq;
   bool is_irq = (RISCV_IRQ_BIT & mcause) != 0;
   bool is_edge = false;
+  uint32_t cpu = esp_cpu_get_core_id();
 
   if (is_irq)
     {
@@ -582,6 +618,17 @@ IRAM_ATTR void *riscv_dispatch_irq(uintreg_t mcause, uintreg_t *regs)
       DEBUGASSERT(CPUINT_ISASSIGNED(g_cpuint_map[cpuint]));
 
       irq = g_cpuint_map[cpuint].irq;
+
+#ifdef CONFIG_ESPRESSIF_IRAM_ISR_DEBUG
+      /* Check if non-IRAM interrupts are disabled */
+
+      if (esp_irq_noniram_status(cpu) == 0)
+        {
+          /* Sum-up the IRAM-enabled counter associated with the IRQ */
+
+          esp_irq_iram_interrupt_record(irq);
+        }
+#endif
 
       is_edge = esprv_intc_int_get_type(cpuint) == INTR_TYPE_EDGE;
       if (is_edge)
@@ -702,6 +749,27 @@ void IRAM_ATTR esp_intr_noniram_enable(void)
 }
 
 /****************************************************************************
+ * Name:  esp_irq_noniram_status
+ *
+ * Description:
+ *   Get the current status of non-IRAM interrupts on a specific CPU core
+ *
+ * Input Parameters:
+ *   cpu - The CPU to check the non-IRAM interrupts state
+ *
+ * Returned Value:
+ *   true if non-IRAM interrupts are enabled, false otherwise.
+ *
+ ****************************************************************************/
+
+bool esp_irq_noniram_status(int cpu)
+{
+  DEBUGASSERT(cpu >= 0 && cpu < CONFIG_SMP_NCPUS);
+
+  return !non_iram_int_disabled_flag[cpu];
+}
+
+/****************************************************************************
  * Name:  esp_get_irq
  *
  * Description:
@@ -804,3 +872,32 @@ int esp_irq_unset_iram_isr(int irq)
 
   return OK;
 }
+
+#ifdef CONFIG_ESPRESSIF_IRAM_ISR_DEBUG
+
+/****************************************************************************
+ * Name:  esp_get_iram_interrupt_records
+ *
+ * Description:
+ *   This function copies the vector that keeps track of the IRQs that ran
+ *   when non-IRAM interrupts were disabled.
+ *
+ * Input Parameters:
+ *
+ *   irq_count - A previously allocated pointer to store the counter of the
+ *               interrupts that ran when non-IRAM interrupts were disabled.
+ *
+ * Returned Value:
+ *   None
+ *
+ ****************************************************************************/
+
+void esp_get_iram_interrupt_records(uint64_t *irq_count)
+{
+  irqstate_t flags = enter_critical_section();
+
+  memcpy(irq_count, &g_iram_count, sizeof(uint64_t) * NR_IRQS);
+
+  leave_critical_section(flags);
+}
+#endif

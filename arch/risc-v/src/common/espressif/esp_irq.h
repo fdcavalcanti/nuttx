@@ -262,6 +262,41 @@ int esp_irq_set_iram_isr(int irq);
 
 int esp_irq_unset_iram_isr(int irq);
 
+/****************************************************************************
+ * Name:  esp_irq_noniram_status
+ *
+ * Description:
+ *   Get the current status of non-IRAM interrupts on a specific CPU core
+ *
+ * Input Parameters:
+ *   cpu - The CPU to check the non-IRAM interrupts state
+ *
+ * Returned Value:
+ *   true if non-IRAM interrupts are enabled, false otherwise.
+ *
+ ****************************************************************************/
+
+bool esp_irq_noniram_status(int cpu);
+
+/****************************************************************************
+ * Name:  esp_get_iram_interrupt_records
+ *
+ * Description:
+ *   This function copies the vector that keeps track of the IRQs that ran
+ *   when non-IRAM interrupts were disabled.
+ *
+ * Input Parameters:
+ *
+ *   irq_count - A previously allocated pointer to store the counter of the
+ *               interrupts that ran when non-IRAM interrupts were disabled.
+ *
+ * Returned Value:
+ *   None
+ *
+ ****************************************************************************/
+
+void esp_get_iram_interrupt_records(uint64_t *irq_count);
+
 #undef EXTERN
 #if defined(__cplusplus)
 }
