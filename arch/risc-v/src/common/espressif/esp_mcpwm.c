@@ -1647,7 +1647,7 @@ static int esp_mcpwm_isr_register(int (*fn)(int, void *, void *),
 
   cpuint = esp_setup_irq(mcpwm_periph_signals.groups[0].irq_id,
                          ESP_IRQ_PRIORITY_DEFAULT,
-                         ESP_IRQ_TRIGGER_LEVEL);
+                         ESP_IRQ_TRIGGER_LEVEL | ESP_IRQ_IRAM);
   if (cpuint < 0)
     {
       cperr("Failed to allocate a CPU interrupt.\n");

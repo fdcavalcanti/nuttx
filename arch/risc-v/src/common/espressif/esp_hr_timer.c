@@ -775,7 +775,7 @@ int esp_hr_timer_init(void)
 
   esp_setup_irq(SYSTIMER_TARGET2_EDGE_INTR_SOURCE,
                 ESP_IRQ_PRIORITY_DEFAULT,
-                SYSTIMER_TRIGGER_TYPE);
+                SYSTIMER_TRIGGER_TYPE | ESP_IRQ_IRAM);
 
   /* Attach the systimer interrupt */
 

@@ -525,7 +525,7 @@ struct oneshot_lowerhalf_s *oneshot_initialize(int chan, uint16_t resolution)
 
   esp_setup_irq(TG1_T0_LEVEL_INTR_SOURCE,
                 ESP_IRQ_PRIORITY_DEFAULT,
-                ESP_IRQ_TRIGGER_LEVEL);
+                ESP_IRQ_TRIGGER_LEVEL | ESP_IRQ_IRAM);
 
   /* Attach the handler for the timer IRQ */
 
