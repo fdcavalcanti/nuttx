@@ -1083,7 +1083,7 @@ static int rmt_isr_register(int (*fn)(int, void *, void *), void *arg,
 
   cpuint = esp_setup_irq(rmt_periph_signals.groups[0].irq,
                          ESP_IRQ_PRIORITY_DEFAULT,
-                         ESP_IRQ_TRIGGER_LEVEL | ESP_IRQ_IRAM);
+                         ESP_IRQ_TRIGGER_LEVEL);
   if (cpuint < 0)
     {
       rmterr("Failed to allocate a CPU interrupt.\n");
