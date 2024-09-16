@@ -284,6 +284,10 @@ static void esp_cpuint_initialize(void)
   /* Indicate that no interrupt sources are assigned to CPU interrupts */
 
   memset(g_cpuint_map, 0, sizeof(g_cpuint_map));
+
+  /* Special case for software interrupt */
+
+  esp_set_irq(ESP_IRQ_FROM_CPU_INTR0, ESP_CPUINT_SOFTWARE_M);
 }
 
 #ifdef CONFIG_ESPRESSIF_IRAM_ISR_DEBUG
