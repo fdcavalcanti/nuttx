@@ -68,7 +68,7 @@
  * Pre-processor Definitions
  ****************************************************************************/
 
-#define TIMER_COMPARE_VALUE_DEFAULT_L 0x2710
+#define TIMER_COMPARE_VALUE_DEFAULT_L 0xfff
 #define TIMER_COMPARE_VALUE_DEFAULT_H 0x0
 
 /****************************************************************************
@@ -119,10 +119,13 @@ IRAM_ATTR static int esp_clint_default_isr(int argc, char *argv[])
  ****************************************************************************/
 
 /****************************************************************************
- * Name: esp_clint_setup
+ * Name: esp_clint_setup_timer_interrupt
  *
  * Description:
- *   .
+ *   Configures machine timer interrupt for ESP_IRQ_FROM_CPU_INTR0.
+ *
+ *   This assumes cpuint 7 (M mode timer interrupt) is properly allocated
+ *   in esp_irq.c as a special case.
  *
  * Input Parameters:
  *   None.
@@ -132,7 +135,7 @@ IRAM_ATTR static int esp_clint_default_isr(int argc, char *argv[])
  *
  ****************************************************************************/
 
-IRAM_ATTR void esp_clint_setup(void)
+IRAM_ATTR void esp_clint_setup_timer_interrupt(void)
 {
   int ret;
 
@@ -339,20 +342,4 @@ IRAM_ATTR uint32_t get_clint_timer_value(bool high)
     {
       return getreg32(CLINT_MINT_MTIME_L_REG);
     }
-}
-
-void esp_clint_debug(void)
-{
-  uint32_t val;
-
-  val = getreg32(CLINT_MINT_TIMECTL_REG);
-  irqinfo("CLINT_MINT_TIMECTL_REG: 0x%x\n", val);
-  val = getreg32(CLINT_MINT_MTIMECMP_H_REG);
-  irqinfo("CLINT_MINT_MTIMECMP_H_REG: 0x%lx\n", val);
-  val = getreg32(CLINT_MINT_MTIMECMP_L_REG);
-  irqinfo("CLINT_MINT_MTIMECMP_L_REG: 0x%lx\n", val);
-  val = READ_CSR(CSR_MIDELEG);
-  irqinfo("CSR_MIDELEG: 0x%x\n", val);
-  val = READ_CSR(CSR_MIE);
-  irqinfo("CSR_MIE: 0x%x\n", val);
 }

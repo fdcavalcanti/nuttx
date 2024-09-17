@@ -45,6 +45,7 @@
 #include "esp_rom_sys.h"
 #include "riscv/interrupt.h"
 #include "soc/soc.h"
+#include "irq.h"
 
 /****************************************************************************
  * Pre-processor Definitions
@@ -285,10 +286,12 @@ static void esp_cpuint_initialize(void)
 
   memset(g_cpuint_map, 0, sizeof(g_cpuint_map));
 
-  /* Special case for software interrupt */
+  /* Special case for software interrupt on ESP32|C6|H2. */
 
-  esp_set_irq(ESP_IRQ_FROM_CPU_INTR0, ESP_CPUINT_SOFTWARE_M);
+#ifndef CONFIG_ARCH_CHIP_ESP32C3_GENERIC
+  esp_set_irq(ESP_IRQ_FROM_CPU_INTR0, ESP_CPUINT_TIMER_INT_M);
   esp_irq_set_iram_isr(ESP_IRQ_FROM_CPU_INTR0);
+#endif
 }
 
 #ifdef CONFIG_ESPRESSIF_IRAM_ISR_DEBUG

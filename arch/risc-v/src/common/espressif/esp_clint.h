@@ -68,7 +68,7 @@ extern "C"
  *
  ****************************************************************************/
 
-void esp_clint_setup(void);
+void esp_clint_setup_timer_interrupt(void);
 void esp_clint_reset_timer_counter(void);
 void esp_clint_set_timer_compare(bool high, uint32_t value);
 void esp_clint_timer_counter_enable(void);
@@ -76,7 +76,6 @@ void esp_clint_timer_counter_disable(void);
 void esp_clint_timer_int_enable(void);
 void esp_clint_timer_int_disable(void);
 uint32_t get_clint_timer_value(bool high);
-void esp_clint_debug(void);
 
 #ifdef __cplusplus
 }
