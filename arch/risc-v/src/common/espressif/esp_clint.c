@@ -18,6 +18,25 @@
  *
  ****************************************************************************/
 
+/* This implementation allows use of the Core Local Interrupts (CLINT).
+ * Those are 4 local level-type interrupt sources that are reserved.
+ *
+ * | ID  |        Description        | Priority |
+ * |  0  | U mode software interrupt |    1     |
+ * |  3  | M mode software interrupt |    3     |
+ * |  4  |  U mode timer interrupt   |    0     |
+ * |  7  |  M mode timer interrupt   |    1     |
+ *
+ * It is possible to use those as simple software interrupt or as timer
+ * counter and interrupt. They are not available as a common interrupt,
+ * and require some specific configuration.
+ *
+ * This is, for now, mostly used for system integration testing.
+ *
+ * For more details, see Technical Reference Manual, section:
+ * - 1.7 for ESP32|C6|H2;
+ */
+
 /****************************************************************************
  * Included Files
  ****************************************************************************/
@@ -49,7 +68,7 @@
  * Pre-processor Definitions
  ****************************************************************************/
 
-#define TIMER_COMPARE_VALUE_DEFAULT_L 0x27100
+#define TIMER_COMPARE_VALUE_DEFAULT_L 0x2710
 #define TIMER_COMPARE_VALUE_DEFAULT_H 0x0
 
 /****************************************************************************
@@ -68,6 +87,20 @@
  * Private Functions
  ****************************************************************************/
 
+/****************************************************************************
+ * Name: esp_clint_setup
+ *
+ * Description:
+ *   Default callback function for CLINT interrupt.
+ *
+ * Input Parameters:
+ *   None.
+ *
+ * Returned Value:
+ *   None.
+ *
+ ****************************************************************************/
+
 IRAM_ATTR static int esp_clint_default_isr(int argc, char *argv[])
 {
   /* Interrupt is cleared by disabling MTIE bit or modifying
@@ -83,6 +116,20 @@ IRAM_ATTR static int esp_clint_default_isr(int argc, char *argv[])
 
 /****************************************************************************
  * Public Functions
+ ****************************************************************************/
+
+/****************************************************************************
+ * Name: esp_clint_setup
+ *
+ * Description:
+ *   .
+ *
+ * Input Parameters:
+ *   None.
+ *
+ * Returned Value:
+ *   None.
+ *
  ****************************************************************************/
 
 IRAM_ATTR void esp_clint_setup(void)
@@ -113,7 +160,7 @@ IRAM_ATTR void esp_clint_setup(void)
                    (xcpt_t)esp_clint_default_isr, NULL);
   if (ret < 0)
     {
-      irqerr("Can't attach irq\n");
+      irqerr("Failed to attach irq: %d\n", ret);
       return;
     }
 
@@ -122,11 +169,41 @@ IRAM_ATTR void esp_clint_setup(void)
   up_enable_irq(ESP_IRQ_FROM_CPU_INTR0);
 }
 
+/****************************************************************************
+ * Name: esp_clint_reset_timer_counter
+ *
+ * Description:
+ *   Reset the timer counter register to 0.
+ *
+ * Input Parameters:
+ *   None.
+ *
+ * Returned Value:
+ *   None.
+ *
+ ****************************************************************************/
+
 IRAM_ATTR void esp_clint_reset_timer_counter(void)
 {
   putreg32(0x0, CLINT_MINT_MTIME_L_REG);
   putreg32(0x0, CLINT_MINT_MTIME_H_REG);
 }
+
+/****************************************************************************
+ * Name: esp_clint_set_timer_compare
+ *
+ * Description:
+ *   Set the timer comparator value for timer interrupt.
+ *
+ * Input Parameters:
+ *   high  - If true, set value for high register bits [63:32]. Otherwise,
+ *           set value for low register bits [31:0].
+ *   value - Value to set.
+ *
+ * Returned Value:
+ *   None.
+ *
+ ****************************************************************************/
 
 IRAM_ATTR void esp_clint_set_timer_compare(bool high, uint32_t value)
 {
@@ -140,6 +217,21 @@ IRAM_ATTR void esp_clint_set_timer_compare(bool high, uint32_t value)
     }
 }
 
+/****************************************************************************
+ * Name: esp_clint_timer_counter_enable
+ *
+ * Description:
+ *   Enable machine timer counter by setting the MTCE bit of the
+ *   MTIMECTL register.
+ *
+ * Input Parameters:
+ *   None.
+ *
+ * Returned Value:
+ *   None.
+ *
+ ****************************************************************************/
+
 IRAM_ATTR void esp_clint_timer_counter_enable(void)
 {
     uint32_t val;
@@ -148,6 +240,21 @@ IRAM_ATTR void esp_clint_timer_counter_enable(void)
     val |= CLINT_MINT_COUNTER_EN;
     putreg32(val, CLINT_MINT_TIMECTL_REG);
 }
+
+/****************************************************************************
+ * Name: esp_clint_timer_counter_disable
+ *
+ * Description:
+ *   Disable machine timer counter by clearing the MTCE bit of the
+ *   MTIMECTL register.
+ *
+ * Input Parameters:
+ *   None.
+ *
+ * Returned Value:
+ *   None.
+ *
+ ****************************************************************************/
 
 IRAM_ATTR void esp_clint_timer_counter_disable(void)
 {
@@ -158,6 +265,21 @@ IRAM_ATTR void esp_clint_timer_counter_disable(void)
     putreg32(val, CLINT_MINT_TIMECTL_REG);
 }
 
+/****************************************************************************
+ * Name: esp_clint_timer_int_enable
+ *
+ * Description:
+ *   Enable machine timer interrupt by setting the MTIE bit of the
+ *   MTIMECTL register.
+ *
+ * Input Parameters:
+ *   None.
+ *
+ * Returned Value:
+ *   None.
+ *
+ ****************************************************************************/
+
 IRAM_ATTR void esp_clint_timer_int_enable(void)
 {
     uint32_t val;
@@ -167,6 +289,21 @@ IRAM_ATTR void esp_clint_timer_int_enable(void)
     putreg32(val, CLINT_MINT_TIMECTL_REG);
 }
 
+/****************************************************************************
+ * Name: esp_clint_timer_int_disable
+ *
+ * Description:
+ *   Disable machine timer interrupt by clearing the MTIE bit of the
+ *   MTIMECTL register.
+ *
+ * Input Parameters:
+ *   None.
+ *
+ * Returned Value:
+ *   None.
+ *
+ ****************************************************************************/
+
 IRAM_ATTR void esp_clint_timer_int_disable(void)
 {
     uint32_t val;
@@ -175,6 +312,22 @@ IRAM_ATTR void esp_clint_timer_int_disable(void)
     val &= ~CLINT_MINT_TIMERINT_EN;
     putreg32(val, CLINT_MINT_TIMECTL_REG);
 }
+
+/****************************************************************************
+ * Name: get_clint_timer_value
+ *
+ * Description:
+ *   Returns current timer counter register value.
+ *   This is a 64 bit register that is read in two blocks of 32 bits each.
+ *
+ * Input Parameters:
+ *   high - True to return the register with high values [63:32].
+ *    False to return low values [31:0].
+ *
+ * Returned Value:
+ *   Current register value.
+ *
+ ****************************************************************************/
 
 IRAM_ATTR uint32_t get_clint_timer_value(bool high)
 {

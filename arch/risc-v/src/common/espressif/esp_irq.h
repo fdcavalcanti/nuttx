@@ -96,6 +96,8 @@ typedef enum irq_priority_e
  * Public Functions Prototypes
  ****************************************************************************/
 
+#define ESP_CPUINT_SOFTWARE_M 7
+
 /****************************************************************************
  * Name: esp_route_intr
  *

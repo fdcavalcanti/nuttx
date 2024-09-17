@@ -288,6 +288,7 @@ static void esp_cpuint_initialize(void)
   /* Special case for software interrupt */
 
   esp_set_irq(ESP_IRQ_FROM_CPU_INTR0, ESP_CPUINT_SOFTWARE_M);
+  esp_irq_set_iram_isr(ESP_IRQ_FROM_CPU_INTR0);
 }
 
 #ifdef CONFIG_ESPRESSIF_IRAM_ISR_DEBUG
