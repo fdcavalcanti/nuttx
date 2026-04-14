@@ -57,6 +57,9 @@ target_include_directories(
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_clock/${CHIP_SERIES}/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_clock/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_regi2c/include
+    ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_regi2c/${CHIP_SERIES}/include
+    ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_systimer/include
+    ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_systimer/${CHIP_SERIES}/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_dma/${CHIP_SERIES}/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_dma/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_gpio/${CHIP_SERIES}/include
