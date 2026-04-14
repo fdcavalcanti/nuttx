@@ -55,6 +55,7 @@ set(ESP32P4_INCLUDES
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_cam/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_clock/${CHIP_SERIES}/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_clock/include
+    ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_regi2c/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_dma/${CHIP_SERIES}/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_dma/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_emac/${CHIP_SERIES}/include
@@ -353,7 +354,6 @@ list(
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_rom/patches/esp_rom_serial_output.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_rom/patches/esp_rom_spiflash.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_rom/patches/esp_rom_sys.c
-  ${ESP_HAL_3RDPARTY_REPO}/components/esp_rom/patches/esp_rom_systimer.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_security/src/esp_crypto_lock.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_security/src/esp_crypto_periph_clk.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_security/src/esp_hmac.c
