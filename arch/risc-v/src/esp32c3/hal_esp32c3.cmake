@@ -280,6 +280,7 @@ list(
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hw_support/mac_addr.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hw_support/periph_ctrl.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hw_support/regi2c_ctrl.c
+  ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_regi2c/${CHIP_SERIES}/regi2c_impl.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hw_support/rtc_module.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hw_support/sleep_modes.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hw_support/sleep_uart.c
