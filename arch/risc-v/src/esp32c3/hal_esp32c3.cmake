@@ -219,6 +219,7 @@ target_link_options(
   -T${ESP_ROM_LD_DIR}/${CHIP_SERIES}.rom.newlib.ld
   -T${ESP_ROM_LD_DIR}/${CHIP_SERIES}.rom.version.ld
   -T${ESP_SOC_LD_DIR}/${CHIP_SERIES}.peripherals.ld
+  -T${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_regi2c/${CHIP_SERIES}/rom.regi2c.ld
   -T${ESP_RISCV_LD_DIR}/rom.api.ld)
 
 # ##############################################################################
@@ -279,7 +280,6 @@ list(
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hw_support/mac_addr.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hw_support/periph_ctrl.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hw_support/regi2c_ctrl.c
-  ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_regi2c/${CHIP_SERIES}/regi2c_impl.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hw_support/rtc_module.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hw_support/sleep_modes.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hw_support/sleep_uart.c
@@ -347,6 +347,7 @@ list(
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_system/system_time.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_system/port/soc/${CHIP_SERIES}/clk.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_system/port/soc/${CHIP_SERIES}/system_internal.c
+  ${ESP_HAL_3RDPARTY_REPO}/components/esp_system/port/soc/${CHIP_SERIES}/reset_reason.c
 )
 
 # ESP Timer
