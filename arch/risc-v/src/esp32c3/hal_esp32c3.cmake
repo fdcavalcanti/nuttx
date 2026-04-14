@@ -119,6 +119,7 @@ target_include_directories(
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_ana_conv/${CHIP_SERIES}/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_clock/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_clock/${CHIP_SERIES}/include
+    ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_regi2c/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_dma/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_dma/${CHIP_SERIES}/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_gpio/include
@@ -329,8 +330,7 @@ list(
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_rom/patches/esp_rom_serial_output.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_rom/patches/esp_rom_spiflash.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_rom/patches/esp_rom_efuse.c
-  ${ESP_HAL_3RDPARTY_REPO}/components/esp_rom/patches/esp_rom_gpio.c
-  ${ESP_HAL_3RDPARTY_REPO}/components/esp_rom/patches/esp_rom_systimer.c)
+  ${ESP_HAL_3RDPARTY_REPO}/components/esp_rom/patches/esp_rom_gpio.c)
 
 # ESP System sources
 list(
@@ -373,7 +373,8 @@ list(
   ${ESP_HAL_3RDPARTY_REPO}/components/hal/hal_utils.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_ledc/ledc_hal.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_ledc/ledc_hal_iram.c
-  ${ESP_HAL_3RDPARTY_REPO}/components/hal/systimer_hal.c
+  ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_systimer/systimer_hal.c
+  ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_systimer/rom_patch.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_timg/timer_hal.c
   ${ESP_HAL_3RDPARTY_REPO}/components/hal/mmu_hal.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_rmt/rmt_hal.c

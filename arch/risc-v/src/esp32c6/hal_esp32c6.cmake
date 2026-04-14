@@ -56,6 +56,7 @@ target_include_directories(
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_ana_conv/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_clock/${CHIP_SERIES}/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_clock/include
+    ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_regi2c/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_dma/${CHIP_SERIES}/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_dma/include
     ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_gpio/${CHIP_SERIES}/include
@@ -395,7 +396,8 @@ list(
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_mspi/spi_flash_hal_iram.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_mspi/spi_flash_hal_gpspi.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_mspi/spi_flash_encrypt_hal_iram.c
-  ${ESP_HAL_3RDPARTY_REPO}/components/hal/systimer_hal.c
+  ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_systimer/systimer_hal.c
+  ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_systimer/rom_patch.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_gpio/rtc_io_hal.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_gpspi/spi_slave_hal_iram.c
   ${ESP_HAL_3RDPARTY_REPO}/components/esp_hal_gpspi/spi_slave_hal.c
