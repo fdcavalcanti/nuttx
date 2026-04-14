@@ -599,12 +599,12 @@ SECTIONS
  soc_reserved_memory_region_start = ABSOLUTE(.);
     KEEP (*(.reserved_memory_address))
     soc_reserved_memory_region_end = ABSOLUTE(.);
-    /* System init functions registered via ESP_SYSTEM_INIT_FN */
+    /* System init functions registered via ESP_SYSTEM_INIT_FN (.esp_sys_init_fn.*) */
 
- . = ALIGN(4);
- _esp_system_init_fn_array_start = ABSOLUTE(.);
-    KEEP (*(SORT_BY_INIT_PRIORITY(.esp_system_init_fn.*)))
-    _esp_system_init_fn_array_end = ABSOLUTE(.);
+    . = ALIGN(4);
+    _esp_sys_init_fn_start = ABSOLUTE(.);
+    KEEP (*(SORT_BY_INIT_PRIORITY(.esp_sys_init_fn.*)))
+    _esp_sys_init_fn_end = ABSOLUTE(.);
     _rodata_end = ABSOLUTE(.);
     . = ALIGN(ALIGNOF(.flash.tdata));
   } > rodata_seg_low
